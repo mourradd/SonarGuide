@@ -1,0 +1,1336 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-palette="editorial">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>دليل تطبيق SonarQube على أي مشروع</title>
+<style>@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap');
+:root{
+ --cov1:#2e2621;--cov2:#4b392e;--cov3:#8a5a3c;--glow:rgba(236,178,120,.28);--b1:#c07440;--b2:#a85d2e;--bfg:#fff;--btn1:#3b6b58;--btn2:#3b6b58;--btnfg:#fff;--tocon:#3a2f27;--tocfg:#fff7ea;--aside:#fffdf8;--stripe:#fbf6ec;--ring:rgba(74,60,49,.10);
+ --bg:#f6f1e8;--card:#fffdf8;--ink:#2d2621;--mute:#6b6055;--line:#e6dccd;--soft:#f1eadd;--soft2:#e8dfcf;
+ --navy:#3a2f27;--thbg:#4a3c31;--thfg:#fff7ea;--teal:#3b6b58;--accent:#c07440;
+ --tealbg:#e4eee7;--amber:#a8691a;--amberbg:#f9eed6;--red:#a4433a;--redbg:#f8e5df;--green:#4a7a4e;--greenbg:#e7f0e1;--blue:#4b6b8a;--bluebg:#e6ecf2;
+ --code:#efe7d8;--codefg:#3a2f27;--pre:#2a221d;--shadow:0 1px 2px rgba(74,60,49,.06),0 8px 24px rgba(74,60,49,.08);
+ --mk:#3b6b58;--hit:#b5472f;--hitbg:#f6e2da;--radius:16px;color-scheme:light}
+:root[data-theme=dark]{
+ --cov1:#1d1815;--cov2:#3a2d24;--cov3:#6f4a33;--glow:rgba(226,163,115,.20);--b1:#e8b080;--b2:#c0793f;--bfg:#241a12;--btn1:#8cc2a6;--btn2:#6aa88c;--btnfg:#10201a;--tocon:#3f342b;--tocfg:#ffe9cc;--aside:#1d1814;--stripe:#272019;--ring:rgba(255,244,230,.06);
+ --bg:#191512;--card:#231e1a;--ink:#f1e9de;--mute:#b4a89a;--line:#3b332b;--soft:#2a241f;--soft2:#342c26;
+ --navy:#3a2f27;--thbg:#3f342b;--thfg:#fff3e2;--teal:#8cc2a6;--accent:#e2a373;
+ --tealbg:#22342b;--amber:#e3b96c;--amberbg:#3a2f1d;--red:#e69083;--redbg:#3d2420;--green:#8ec99b;--greenbg:#223420;--blue:#92b2d2;--bluebg:#25323f;
+ --code:#342c26;--codefg:#f0e6d8;--pre:#120e0b;--shadow:0 1px 0 rgba(255,244,230,.04) inset,0 12px 30px rgba(8,5,3,.5);
+ --mk:#e2a373;--hit:#e69083;--hitbg:#3d2420;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;scroll-padding-top:76px;-webkit-text-size-adjust:100%}
+body{margin:0;font:16px/1.8 "Segoe UI",Tahoma,"Noto Sans Arabic","Geeza Pro",Arial,sans-serif;color:var(--ink);background:var(--bg);overflow-wrap:break-word}
+.en,code,.mono{direction:ltr;unicode-bidi:isolate;display:inline-block;font-family:Consolas,"Cascadia Mono","SF Mono",monospace;font-size:.82em;overflow-wrap:anywhere;max-width:100%}
+code,.mono{background:var(--code);color:var(--codefg);padding:0 6px;border-radius:6px}
+a{color:var(--teal)}
+#prog{position:fixed;top:0;inset-inline:0;height:3px;z-index:60;background:transparent}
+#prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--blue))}
+.topbar{display:none}
+.layout{display:grid;grid-template-columns:288px minmax(0,1fr);max-width:1400px;margin:0 auto}
+aside.side{position:sticky;top:0;height:100vh;overflow:auto;padding:20px 16px;background:var(--card);border-inline-end:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.brand .lg{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--blue));display:grid;place-items:center;color:#fff;font-weight:800;font-size:15px}
+.brand b{font-size:16px;color:var(--ink);line-height:1.3}.brand small{display:block;color:var(--mute);font-size:12px;font-weight:400}
+#q{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:12px;font:inherit;font-size:14.5px;background:var(--soft);color:var(--ink)}
+#q:focus{outline:2px solid var(--accent);background:var(--card)}
+#qinfo{font-size:12.5px;color:var(--mute);min-height:20px;margin:5px 2px 6px}
+aside.side ol{list-style:none;margin:0;padding:0}
+aside.side li a{display:block;padding:8px 12px;border-radius:10px;color:var(--ink);text-decoration:none;font-size:14.5px;line-height:1.5}
+aside.side li a:hover{background:var(--soft2)}
+aside.side li a.on{background:var(--navy);color:#fff;font-weight:600}
+.sidebtn{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
+main{padding:0 30px 80px;min-width:0}
+header.cover{margin:0 -30px 0;padding:54px 30px 70px;color:#fff;background:radial-gradient(1200px 420px at 85% -10%,var(--glow),transparent 60%),linear-gradient(135deg,var(--cov1) 0%,var(--cov2) 58%,var(--cov3) 135%)}
+.kick{display:inline-block;font-size:12.5px;font-weight:700;color:#f6cf9f;background:rgba(255,236,214,.12);border-radius:999px;padding:3px 13px}
+h1{font-size:clamp(28px,5vw,44px);line-height:1.25;margin:14px 0 12px;letter-spacing:-.2px}
+header.cover p{max-width:820px;color:#f1e6d8;margin:8px 0;font-size:16px}
+header.cover .meta{font-size:13.5px;color:#d3bfa8}
+#live{margin-top:-40px;position:relative}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow)}
+.stat .big{font-size:38px;font-weight:800;line-height:1.1;margin:2px 0}
+.stat .lbl{font-size:13.5px;color:var(--mute)}
+.ok{color:var(--green)}.bd{color:var(--red)}
+section[data-s]{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:6px 30px 26px;margin:26px 0;box-shadow:var(--shadow)}
+h2{font-size:clamp(21px,3.4vw,28px);margin:22px 0 8px;color:var(--ink);display:flex;align-items:center;gap:12px;line-height:1.4}
+h2 .n{flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--blue));color:#fff;font-size:17px;font-weight:800}
+h3{font-size:19px;margin:30px 0 8px;color:var(--teal);padding-inline-start:12px;border-inline-start:4px solid var(--accent)}
+h4{font-size:15.5px;margin:18px 0 6px}
+p{margin:8px 0 12px}
+.lead{color:var(--mute);font-size:16.5px}
+.tw{overflow-x:auto;margin:12px 0 18px;border:1px solid var(--line);border-radius:12px;-webkit-overflow-scrolling:touch}
+.tw table{margin:0;border:0}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:14.5px}
+th{background:var(--thbg);color:var(--thfg);text-align:start;padding:10px 12px;font-weight:600;white-space:nowrap}
+td{border-top:1px solid var(--line);padding:9px 12px;vertical-align:top}
+tr:nth-child(even) td{background:var(--soft)}
+td.k{font-weight:600;min-width:96px}
+th code,th .mono{background:rgba(255,255,255,.16);color:#fff}
+pre{direction:ltr;text-align:left;background:var(--pre);color:#efe6d8;padding:14px 16px;border-radius:12px;overflow:auto;font:13px/1.6 Consolas,"Cascadia Mono","SF Mono",monospace;margin:10px 0 16px;white-space:pre;position:relative}
+.cp{position:absolute;top:8px;left:8px;font:12px "Segoe UI",Tahoma;background:rgba(255,255,255,.14);color:#fff;border:0;border-radius:8px;padding:4px 11px;cursor:pointer}
+.note,.warn,.good,.info,.bad{border-radius:12px;padding:12px 16px;margin:14px 0;font-size:15px;border-inline-start:5px solid}
+.note{background:var(--tealbg);border-color:var(--teal)}.warn{background:var(--amberbg);border-color:var(--amber)}.bad{background:var(--redbg);border-color:var(--red)}.good{background:var(--greenbg);border-color:var(--green)}.info{background:var(--bluebg);border-color:var(--blue)}
+.note>b:first-child,.warn>b:first-child,.good>b:first-child,.info>b:first-child,.bad>b:first-child{display:block;margin-bottom:3px}
+.tag{display:inline-block;font-size:12.5px;font-weight:700;border-radius:999px;padding:0 10px;margin-inline-end:4px}
+.t-local{background:var(--greenbg);color:var(--green)}.t-server{background:var(--bluebg);color:var(--blue)}.t-read{background:var(--tealbg);color:var(--teal)}.t-warn{background:var(--amberbg);color:var(--amber)}.t-no{background:var(--redbg);color:var(--red)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{border:1px solid var(--line);border-radius:14px;padding:14px 16px;background:var(--card)}
+.card h4{margin-top:0}
+details{border:1px solid var(--line);border-radius:14px;margin:10px 0;background:var(--card)}
+details>summary{cursor:pointer;padding:12px 16px;font-weight:600;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:46px}
+details>summary::-webkit-details-marker{display:none}
+details>summary::after{content:"+";flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--tealbg);color:var(--teal);font-weight:800}
+details[open]>summary::after{content:"−"}
+details>div{padding:6px 16px 14px;border-top:1px solid var(--line)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:8px 16px;font:inherit;font-size:14px;cursor:pointer;min-height:40px}
+.chip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 14px;font:inherit;font-size:14px;cursor:pointer;color:var(--ink);min-height:40px}
+.btn:hover{background:var(--soft2)}
+.lanes{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.lane{border-radius:16px;padding:14px;border:1px solid}
+.lane.l{background:var(--greenbg);border-color:var(--green)}.lane.s{background:var(--bluebg);border-color:var(--blue)}
+.lane h4{margin:0 0 8px}.lane.l h4{color:var(--green)}.lane.s h4{color:var(--blue)}
+.step{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:start;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0;font:inherit;cursor:pointer;min-height:52px}
+.step .st{flex:1;min-width:0}
+.step .no{flex:none;width:28px;height:28px;line-height:28px;text-align:center;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;font-size:13px}
+.step.on{outline:3px solid var(--accent)}.step.on .no{background:var(--teal)}
+.step b{display:block;font-size:15px}.step .sub{display:block;font-size:13px;color:var(--mute);direction:rtl;unicode-bidi:plaintext}
+.step .sd{display:none;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font-size:14px}
+.step.on .sd{display:block}
+.helper{border:1px solid var(--line);border-radius:16px;padding:16px;background:var(--soft)}
+.helper select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);font:inherit;background:var(--card);color:var(--ink);min-height:46px}
+#ans{margin-top:10px;min-height:56px}
+figure.shot{margin:18px 0;border:1px solid var(--line);border-radius:16px;background:var(--card);overflow:hidden;box-shadow:var(--shadow)}
+figure.shot .shead{padding:10px 16px;background:var(--soft);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14.5px}
+.sbody{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}
+.simg{position:relative;direction:ltr;cursor:zoom-in;background:#fafbfd;border-inline-end:1px solid var(--line);align-self:start}
+.simg img{display:block;width:100%;height:auto}
+.mk{position:absolute;border:2px solid transparent;border-radius:5px;pointer-events:none}
+.mk i{position:absolute;top:-11px;left:-11px;width:22px;height:22px;border-radius:50%;background:var(--mk);color:#fff;font:700 11.5px/22px "Segoe UI",Arial;text-align:center;font-style:normal;pointer-events:auto;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,.4)}
+.mk.on{border-color:var(--hit);background:rgba(225,29,72,.12)}
+.mk.on i{background:var(--hit);transform:scale(1.2)}
+.slist{max-height:540px;overflow:auto;padding:10px 12px}
+.si{display:flex;gap:11px;padding:9px 10px;border-radius:12px;cursor:pointer;font-size:14.5px;line-height:1.6}
+.si:hover{background:var(--soft)}
+.si.on{background:var(--hitbg);outline:1px solid var(--hit)}
+.si .no{flex:none;width:26px;height:26px;line-height:26px;text-align:center;border-radius:50%;background:var(--mk);color:#fff;font-weight:700;font-size:12px}
+.si.on .no{background:var(--hit)}
+.si b{display:block}
+.zoomhint{font-size:12.5px;color:var(--mute)}
+#lb{position:fixed;inset:0;background:rgba(6,10,22,.92);z-index:80;display:none;overflow:auto;padding:56px 14px 20px;-webkit-overflow-scrolling:touch}
+#lb img{display:block;margin:0 auto;width:min(1500px,100%);max-width:none;border-radius:10px;background:#fff}
+#lbx{position:fixed;top:10px;inset-inline-start:10px;z-index:90;display:none;width:44px;height:44px;border-radius:50%;border:0;background:#fff;color:#111;font-size:22px;cursor:pointer}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.pane{display:none}.pane.on{display:block}
+.diff{direction:ltr;text-align:left;border-radius:12px;overflow:auto;font:13px/1.6 Consolas,"Cascadia Mono","SF Mono",monospace;margin:8px 0 14px;border:1px solid var(--line)}
+.diff div{padding:0 12px;white-space:pre}
+.diff .a{background:#e7f0e1;color:#2f5a33}.diff .d{background:#f8e5df;color:#7a2d25}.diff .h{background:var(--soft2);color:var(--mute)}
+:root[data-theme=dark] .diff .a{background:#223420;color:#b6e3bf}:root[data-theme=dark] .diff .d{background:#3d2420;color:#f3b6ab}
+.bars{display:grid;gap:10px;margin:12px 0}
+.bar{display:grid;grid-template-columns:84px 1fr 48px;align-items:center;gap:12px;font-size:14.5px}
+.bar .tr{height:22px;background:var(--soft2);border-radius:8px;overflow:hidden;direction:ltr}
+.bar .fl{height:100%;background:linear-gradient(90deg,var(--navy),var(--blue));width:0;transition:width .9s}
+.bar .vv{font-weight:700;text-align:end;direction:ltr}
+.ckl label{display:flex;gap:12px;align-items:flex-start;padding:8px 4px;cursor:pointer;min-height:44px}
+.ckl input{margin-top:7px;width:19px;height:19px;accent-color:var(--teal);flex:none}
+.ckl label.done span{color:var(--mute);text-decoration:line-through}
+footer{border-top:1px solid var(--line);margin-top:30px;padding-top:14px;color:var(--mute);font-size:13px}
+#totop{position:fixed;bottom:18px;inset-inline-start:18px;width:46px;height:46px;border-radius:50%;border:0;background:var(--navy);color:#fff;font-size:20px;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.25s;z-index:40}
+#totop.show{opacity:1;pointer-events:auto}
+.printonly{display:none}.hide{display:none!important}
+@media(max-width:1100px){.layout{grid-template-columns:250px minmax(0,1fr)}main{padding:0 20px 70px}header.cover{margin:0 -20px;padding:44px 20px 64px}}
+@media(max-width:900px){
+ html{scroll-padding-top:70px}
+ .topbar{display:flex;position:sticky;top:0;z-index:55;align-items:center;gap:10px;padding:8px 12px;background:var(--card);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+ .topbar b{flex:1;font-size:15.5px}
+ .topbar button{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--soft);color:var(--ink);font-size:20px;cursor:pointer}
+ .layout{display:block}
+ aside.side{position:fixed;top:0;bottom:0;inset-inline-start:0;width:min(330px,88vw);height:auto;z-index:70;transform:translateX(105%);transition:transform .28s;box-shadow:var(--shadow);border:0}
+ html[dir=rtl] aside.side{inset-inline-start:auto;right:0;left:auto}
+ body.menu aside.side{transform:none}
+ #scrim{position:fixed;inset:0;background:rgba(5,10,25,.55);z-index:65;opacity:0;pointer-events:none;transition:.25s}
+ body.menu #scrim{opacity:1;pointer-events:auto}
+ main{padding:0 12px 70px}
+ header.cover{margin:0 -12px;padding:30px 16px 56px}
+ #live{margin-top:-30px}
+ section[data-s]{padding:2px 16px 20px;border-radius:16px;margin:18px 0}
+ .grid2,.lanes{grid-template-columns:1fr}
+ .sbody{display:block}
+ figure.shot{overflow:visible}
+ figure.shot .shead{border-radius:16px 16px 0 0}
+ .slist{border-radius:0 0 16px 16px}
+ .grid3{grid-template-columns:1fr}
+ #mcpflow{grid-template-columns:1fr 1fr!important}
+ .simg{border-inline-end:0;border-bottom:1px solid var(--line);position:sticky;top:62px;z-index:6;box-shadow:0 6px 14px rgba(16,24,40,.12)}
+ .slist{max-height:none}
+ .mk i{width:15px;height:15px;top:-7px;left:-7px;font-size:8.5px;line-height:15px}
+ .mk.on i{transform:scale(1.5)}
+ h3{font-size:17.5px}
+}
+@media(max-width:700px){
+ body{font-size:15.5px}
+ .tw{border:0;overflow:visible;background:transparent}
+ .tw table,.tw tbody,.tw tr,.tw td{display:block;width:100%}
+ .tw tr:first-child:has(th){display:none}
+ .tw tr{border:1px solid var(--line);border-radius:12px;margin:0 0 10px;background:var(--card);overflow:hidden}
+ .tw td{border:0;border-bottom:1px dashed var(--line);padding:8px 12px;background:transparent!important}
+ .tw td:last-child{border-bottom:0}
+ .tw td::before{content:attr(data-label);display:block;font-size:12px;font-weight:700;color:var(--teal);margin-bottom:1px}
+ .tw td[data-label=""]::before{display:none}
+ .tw td.k{background:var(--soft)!important;font-size:15px}
+ #mcpflow{grid-template-columns:1fr!important}
+ .bar{grid-template-columns:64px 1fr 40px;gap:8px}
+ .stat .big{font-size:32px}
+ pre{font-size:12px}
+ .cp{padding:3px 9px}
+}
+@media print{
+ :root,:root[data-theme=dark]{--bg:#fff;--card:#fff;--ink:#2d2621;--mute:#6b6055;--line:#ddd2c1;--soft:#f6f1e8;--soft2:#ece3d4;--thbg:#4a3c31;--thfg:#fff7ea;--teal:#3b6b58;--tealbg:#e4eee7;--amber:#a8691a;--amberbg:#f9eed6;--red:#a4433a;--redbg:#f8e5df;--green:#4a7a4e;--greenbg:#e7f0e1;--blue:#4b6b8a;--bluebg:#e6ecf2;--code:#efe7d8;--codefg:#3a2f27;--mk:#3b6b58;--hit:#b5472f;--hitbg:#f6e2da;--navy:#3a2f27;--shadow:none}
+ body{font-size:11px;line-height:1.55;background:#fff}
+ aside.side,.noprint,.cp,.zoomhint,#lb,#lbx,#totop,#prog,.topbar,#scrim{display:none!important}
+ .layout{display:block;max-width:none}
+ main{padding:0}
+ header.cover{margin:0 0 14px;padding:22px 14px;border-radius:0}
+ #live{margin-top:0}
+ section[data-s]{border:0;box-shadow:none;padding:0;margin:0}
+ h2 .n{width:30px;height:30px;font-size:14px}
+ th,.note,.warn,.good,.info,.bad,.tag,pre,.diff div,.si .no,.mk i,tr:nth-child(even) td,.lane,.fl,header.cover,h2 .n{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ h2{break-after:avoid;margin-top:24px}h3,h4{break-after:avoid}
+ table,.card,pre,.note,.warn,.good,.info,.bad,.diff,.simg,.si,.stat{break-inside:avoid}
+ tr{break-inside:avoid}
+ table{font-size:10.4px}
+ .tw{border:0;overflow:visible}
+ .tw table{display:table!important}.tw tbody{display:table-row-group!important}.tw tr{display:table-row!important;border:0}.tw td{display:table-cell!important;width:auto!important;border-top:1px solid var(--line)!important;padding:5px 8px!important}.tw td::before{display:none!important}.tw tr:first-child:has(th){display:table-row!important}
+ .shead{break-after:avoid}
+ .grid2{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:repeat(3,1fr)}.lanes{grid-template-columns:1fr 1fr}
+ .sbody{grid-template-columns:1fr 1fr}
+ .simg{border-inline-end:1px solid var(--line)}
+ .slist{max-height:none;overflow:visible;font-size:10.3px}
+ .sbody{display:grid}
+ .simg{position:relative;top:auto;box-shadow:none}
+ .mk{border-color:rgba(225,29,72,.6)}
+ .pane{display:block!important;margin-bottom:8px}
+ .step .sd{display:block}
+ details>div{display:block}
+ .printonly{display:block}
+ pre{white-space:pre-wrap}
+ .pb{break-before:page}
+}
+@page{size:A4;margin:12mm 11mm 14mm 11mm}
+
+#lb.viewer{display:none;flex-direction:column;padding:0;overflow:hidden;background:#17120f;cursor:default}
+#lb .vh{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;color:#fff;background:#211b17;flex:none}
+#lb .vh b{font-size:15.5px;min-width:0}
+#lb .vc{display:flex;align-items:center;gap:8px;flex:none}
+#lb .vb{min-width:44px;height:44px;border-radius:12px;border:0;background:#fff;color:#111;font:inherit;font-size:22px;cursor:pointer;padding:0 12px}
+#lb .vb:disabled{opacity:.4;cursor:default}
+#lb .vb.vx{font-size:14px;background:#e11d48;color:#fff}
+#lb .zl{min-width:52px;text-align:center;font-variant-numeric:tabular-nums}
+#lb .vbody{flex:1;min-height:0;display:flex}
+#lb .vs{flex:1;min-width:0;overflow:auto;padding:14px;-webkit-overflow-scrolling:touch}
+#lb .vw{position:relative;margin:0 auto;direction:ltr;transition:width .2s}
+#lb .vw img{display:block;width:100%;max-width:100%;height:auto;margin:0;border-radius:8px;background:#fff}
+#lb .vw .mk i{width:26px;height:26px;line-height:26px;font-size:12.5px;top:-13px;left:-13px}
+#lb .vw .mk.on i{transform:scale(1.25)}
+#lb .vp{flex:none;width:min(390px,38vw);background:var(--card);color:var(--ink);display:flex;flex-direction:column;min-height:0;border-inline-start:1px solid var(--line)}
+#lb .vsel{display:flex;gap:12px;padding:14px;background:var(--hitbg);border-bottom:1px solid var(--line);flex:none}
+#lb .vsel .no{flex:none;width:34px;height:34px;line-height:34px;text-align:center;border-radius:50%;background:var(--hit);color:#fff;font-weight:800}
+#lb .vsel b{display:block;font-size:16px}#lb .vsel p{margin:4px 0 0;font-size:15px}
+#lb .vnav{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 14px;flex:none}
+#lb .vnav small{color:var(--mute);font-size:12.5px}
+#lb .vlist{overflow:auto;padding:8px 10px;flex:1;min-height:0}
+@media(max-width:900px){#lb .vbody{flex-direction:column}#lb .vp{width:auto;max-height:44vh;border-inline-start:0;border-top:1px solid var(--line)}#lb .vs{padding:8px}#lb .vh b{font-size:14px}}
+
+@media(max-width:700px){#lb .vw .mk i{width:21px;height:21px;line-height:21px;font-size:10.5px;top:-10px;left:-10px}}
+
+@media print{
+ .tall .simg{display:none}
+ .tall .sbody{display:block}
+ .tall .slist{columns:2;column-gap:14px;margin-top:6px}
+ .tall .slist .si{break-inside:avoid}
+ .slice{position:relative;margin:0 0 8px;border:1px solid var(--line);break-inside:avoid}
+ .slice img{display:block;width:100%;height:auto}
+ .slice .mk i{width:20px;height:20px;line-height:20px;font-size:10px;top:-10px;left:-10px}
+}
+
+@media(max-width:900px){
+ .tall .simg{position:relative;top:auto;box-shadow:none}
+ .tall .slist{max-height:none}
+}
+.simg{overflow:clip;overflow-clip-margin:14px}
+
+.ex{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);font-size:13.4px;line-height:1.75}
+.ex:empty{display:none}
+.exr{margin:3px 0}
+.exr b{color:var(--teal)}
+.exr.src{color:var(--mute);font-size:12.3px}
+#lb .vsel{flex:0 1 auto;max-height:58%;overflow:auto}
+#lb .vsel .ex{font-size:14px;border-top-color:rgba(0,0,0,.18)}
+#lb .vsel{align-items:flex-start}
+@media print{.ex{font-size:9.6px}.exr.src{font-size:8.8px}}
+@media(max-width:900px){
+ #lb .vp{max-height:54vh;overflow:auto}
+ #lb .vsel{max-height:none;overflow:visible;flex:none}
+ #lb .vlist{overflow:visible;flex:none}
+}
+
+/* ---- flowcharts, maps, infographic ---- */
+.flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin:12px 0}
+.fn{flex:1 1 150px;min-width:130px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:10px 12px;font-size:14px;line-height:1.55}
+.fn b{display:block;font-size:14.5px}
+.fn small{display:block;color:var(--mute);font-size:12.6px;line-height:1.5}
+.fn.ok{background:var(--greenbg);border-color:var(--green)}
+.fn.srv{background:var(--bluebg);border-color:var(--blue)}
+.fn.warnb{background:var(--amberbg);border-color:var(--amber)}
+.fn.badb{background:var(--redbg);border-color:var(--red)}
+.fn.key{background:var(--tealbg);border-color:var(--teal)}
+.fa{flex:0 0 auto;align-self:center;color:var(--teal);font-weight:800;font-size:20px;line-height:1}
+.fa::before{content:"\2190"}
+.fa.dn::before{content:"\2193"}
+.lane2{border-radius:16px;padding:12px 14px;margin:10px 0;border:1px solid}
+.lane2>h4{margin:0 0 6px;font-size:14.5px}
+.lane2.l{background:var(--greenbg);border-color:var(--green)}.lane2.l>h4{color:var(--green)}
+.lane2.c{background:var(--amberbg);border-color:var(--amber)}.lane2.c>h4{color:var(--amber)}
+.lane2.s{background:var(--bluebg);border-color:var(--blue)}.lane2.s>h4{color:var(--blue)}
+.lane2.m{background:var(--tealbg);border-color:var(--teal)}.lane2.m>h4{color:var(--teal)}
+.vlink{text-align:center;color:var(--mute);font-size:13px;margin:2px 0}
+.vlink::before{content:"\2193  "}
+.dq{border:2px solid var(--amber);background:var(--amberbg);border-radius:16px;padding:10px 14px;font-weight:700;margin:10px 0;text-align:center}
+.brs{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:10px;margin:8px 0 14px}
+.br{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:10px 12px;font-size:14px;line-height:1.6}
+.br h5{margin:0 0 4px;font-size:14px;color:var(--red)}
+.br h5.y{color:var(--green)}
+.br .act{margin-top:6px;padding:6px 9px;border-radius:10px;background:var(--greenbg);font-size:13.4px}
+.qa{display:grid;grid-template-columns:1.15fr auto .85fr;gap:8px;align-items:stretch;margin:6px 0}
+.qa .q{border:2px solid var(--amber);background:var(--amberbg);border-radius:14px;padding:8px 12px;font-size:14px}
+.qa .a{border:1px solid var(--red);background:var(--redbg);border-radius:14px;padding:8px 12px;font-size:13.6px}
+.qa .m{align-self:center;color:var(--red);font-weight:800;font-size:13px;white-space:nowrap}
+.tl{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:12px 0}
+.tl .ph{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:10px 12px;font-size:13.8px;line-height:1.6}
+.tl .ph .pn{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--teal);color:#fff;font-weight:800;font-size:12.5px;margin-inline-end:6px}
+.tl .ph b{font-size:14.5px}
+.tl .ph em{display:block;font-style:normal;color:var(--teal);font-size:12.8px;margin-top:4px}
+.nc{border:1px solid var(--line);border-radius:18px;background:var(--card);padding:14px;margin:14px 0;box-shadow:var(--shadow)}
+.nc-lab{display:flex;justify-content:space-between;gap:8px;font-size:12.8px;color:var(--mute);margin-bottom:6px}
+.nc-bar{display:flex;align-items:stretch;border-radius:14px;overflow:hidden;min-height:120px}
+.nc-old{flex:56;padding:12px 14px;color:var(--mute);background:repeating-linear-gradient(135deg,var(--soft2),var(--soft2) 10px,var(--soft) 10px,var(--soft) 20px);font-size:13.8px;line-height:1.6}
+.nc-base{flex:0 0 8px;background:var(--amber)}
+.nc-new{flex:36;padding:12px 14px;background:var(--greenbg);border:2px solid var(--green);border-inline-start:0;color:var(--ink);font-size:13.8px;line-height:1.6}
+.nc-old b,.nc-new b{display:block;font-size:15px;color:var(--ink)}
+.gate4{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:12px 0}
+.gate4 div{border-radius:12px;background:var(--tealbg);padding:8px 10px;text-align:center;font-size:13px;color:var(--mute)}
+.gate4 b{display:block;font-size:22px;color:var(--teal);line-height:1.3}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:10px 0}
+.opts div{border:1px solid var(--line);border-radius:12px;padding:8px 11px;font-size:13.4px;background:var(--card);line-height:1.6}
+.opts b{display:block;color:var(--teal);font-size:14px}
+.linkrow{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+a.btn{text-decoration:none}
+a.btn.pri{background:var(--teal);color:#fff;border-color:var(--teal)}
+@media(max-width:700px){
+ .flow{flex-direction:column}
+ .fa{align-self:center}
+ .fa::before{content:"\2193"}
+ .fn{flex-basis:auto}
+ .qa{grid-template-columns:1fr}
+ .qa .m{text-align:center}
+ .nc-bar{flex-direction:column}
+ .nc-base{flex:0 0 8px}
+ .nc-new{border-inline-start:2px solid var(--green)}
+}
+@media print{
+ .flow,.brs,.tl,.opts,.gate4{break-inside:avoid}
+ .fn,.br,.qa,.nc,.tl .ph{break-inside:avoid}
+ .flow{flex-direction:row}
+ .fa::before{content:"\2190"}
+ .nc-bar{flex-direction:row}
+ .nc,.fn,.br,.dq,.qa .q,.qa .a,.lane2,.nc-old,.nc-new,.nc-base,.gate4 div,.tl .pn{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+.small{font-size:13px;color:var(--mute)}
+.tl .ph b::after{content:"";display:block;margin-bottom:3px}
+
+.hist{border:1px solid var(--line);border-radius:16px;background:var(--card);padding:10px 12px;margin:12px 0}
+.hist h4{margin:0 0 4px;font-size:14.5px}
+.hist svg{display:block;width:100%;height:auto;direction:ltr}
+.stat .big{font-size:clamp(22px,4vw,34px)}
+@media print{.hist{break-inside:avoid}}
+.hist{overflow-x:auto}
+.hist svg{min-width:600px}
+@media print{.hist svg{min-width:0}}
+
+/* ---- finish (token driven; works for every palette) ---- */
+body{background:radial-gradient(900px 500px at 90% -6%,var(--ring),transparent 60%),var(--bg)}
+h2,h3{color:var(--ink);letter-spacing:0}
+aside.side{background:var(--aside)}
+section[data-s],.card,.stat,.fn,.br,.hist,.nc,.tl .ph,.info,.note,.warn,.good{border-radius:14px}
+section[data-s]{border-width:1px;border-color:var(--line)}
+.n,.tl .ph .pn,.brand .lg{background:linear-gradient(135deg,var(--b1),var(--b2));color:var(--bfg)}
+#toc a.on{background:var(--tocon);color:var(--tocfg)}
+a.btn.pri{background:linear-gradient(135deg,var(--btn1),var(--btn2));color:var(--btnfg);border-color:transparent}
+.fa,.gate4 b,.opts b{color:var(--accent)}
+.gate4 div{background:var(--soft)}
+table tr:nth-child(even) td{background:var(--stripe)}
+.btn,.chip,#toc a,a.btn{transition:background .35s cubic-bezier(.16,1,.3,1),color .35s cubic-bezier(.16,1,.3,1),border-color .35s cubic-bezier(.16,1,.3,1),transform .35s cubic-bezier(.16,1,.3,1)}
+.btn:hover,a.btn:hover{transform:translateY(-1px)}
+@media(min-width:1101px){section[data-s]{padding:12px 44px 38px;margin:34px 0}main{padding:0 36px 90px}header.cover{margin:0 -36px}}
+@media(max-width:700px){header.cover{background-image:radial-gradient(900px 300px at 85% -10%,var(--glow),transparent 60%),linear-gradient(135deg,var(--cov1) 0%,var(--cov2) 58%,var(--cov3) 135%)!important}}
+.pal{display:flex;gap:8px;align-items:center;margin:10px 0 4px}
+.pal span{font-size:12.5px;color:var(--mute);margin-inline-end:4px}
+.pal button{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);cursor:pointer;padding:0;transition:transform .35s cubic-bezier(.16,1,.3,1),border-color .35s}
+.pal button:hover{transform:scale(1.1)}
+.pal button.on{border-color:var(--ink);box-shadow:0 0 0 2px var(--card) inset}
+.ba{margin:10px 0 2px}
+.ba-row{display:grid;grid-template-columns:92px 1fr;align-items:center;gap:10px;margin:5px 0;font-size:13px}
+.ba-l{color:var(--mute)}
+.ba-t{position:relative;height:28px;background:var(--soft2);border-radius:9px;overflow:hidden;direction:ltr}
+.ba-f{position:absolute;top:0;bottom:0;left:0;display:flex;align-items:center;border-radius:9px;line-height:1;margin:0}
+.ba-f i{font-style:normal;font-weight:700;font-size:12.5px;padding:0 10px;white-space:nowrap;direction:rtl;line-height:1}
+.ba-f.bad{background:var(--red);color:#fff}
+.ba-f.good{background:var(--green);color:#fff}
+.ba-f.warnx{background:var(--amber);color:#fff}
+:root[data-theme=dark] .ba-f.bad,:root[data-theme=dark] .ba-f.good,:root[data-theme=dark] .ba-f.warnx{color:#14110e}
+@media print{.ba-f{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
+/* ---- palettes ---- */
+:root[data-palette=editorial]{--bg:#FBFBFA;--card:#FFFFFF;--ink:#1A1A1A;--mute:#6A665F;--line:#E8E5DE;--soft:#F4F2EE;--soft2:#EBE8E1;--navy:#1A1A1A;--thbg:#1A1A1A;--thfg:#F5F1E8;--teal:#6F5F3F;--accent:#8C7853;--tealbg:#F3EEE3;--amber:#94661A;--amberbg:#F7EFD9;--red:#9B3F36;--redbg:#F6E4E0;--green:#4A6B4E;--greenbg:#E8EFE5;--blue:#4A5F78;--bluebg:#E8ECF1;--code:#F1EEE8;--codefg:#1A1A1A;--pre:#17171A;--shadow:0 1px 2px rgba(26,26,26,.03),0 14px 44px rgba(26,26,26,.05);--mk:#6F5F3F;--hit:#9B3F36;--hitbg:#F6E4E0;--cov1:#121214;--cov2:#1F1E1B;--cov3:#4A4132;--glow:rgba(196,171,122,.22);--b1:#8C7853;--b2:#6F5F3F;--bfg:#FFFFFF;--btn1:#1A1A1A;--btn2:#1A1A1A;--btnfg:#F5F1E8;--tocon:#1A1A1A;--tocfg:#F5F1E8;--aside:#FFFFFF;--stripe:#FAF9F6;--ring:rgba(26,26,26,.06);}
+:root[data-palette=editorial][data-theme=dark]{--bg:#121214;--card:#1A1A1D;--ink:#F2EFE8;--mute:#A7A298;--line:#2D2C2A;--soft:#202022;--soft2:#2A2A2C;--navy:#26262A;--thbg:#26262A;--thfg:#F2E9D6;--teal:#C4AB7A;--accent:#C4AB7A;--tealbg:#2A2519;--amber:#D9B46A;--amberbg:#2D2616;--red:#E0908A;--redbg:#34201E;--green:#94B898;--greenbg:#1F2A22;--blue:#9DB3CC;--bluebg:#1F2733;--code:#2A2A2C;--codefg:#EFE9DC;--pre:#0D0D0F;--shadow:0 1px 0 rgba(255,244,230,.03) inset,0 16px 40px rgba(0,0,0,.45);--mk:#C4AB7A;--hit:#E0908A;--hitbg:#34201E;--cov1:#0D0D0F;--cov2:#1A1A1D;--cov3:#3A3224;--glow:rgba(196,171,122,.16);--b1:#D2BA89;--b2:#A8905F;--bfg:#1A1408;--btn1:#D2BA89;--btn2:#A8905F;--btnfg:#1A1408;--tocon:#2A2A2C;--tocfg:#F2E9D6;--aside:#151517;--stripe:#1D1D20;--ring:rgba(255,244,230,.05); color-scheme:dark}
+:root[data-palette=executive]{--bg:#F4F5F8;--card:#FFFFFF;--ink:#0B0F17;--mute:#5B6578;--line:#DFE3EB;--soft:#EEF0F5;--soft2:#E3E7EF;--navy:#161F30;--thbg:#161F30;--thfg:#F3E3A9;--teal:#7A6118;--accent:#D4AF37;--tealbg:#F6EFD6;--amber:#8A6410;--amberbg:#F7EDCF;--red:#9B3F4A;--redbg:#F6E3E5;--green:#3F6E57;--greenbg:#E3EFE9;--blue:#3B5878;--bluebg:#E4EBF4;--code:#E9ECF3;--codefg:#161F30;--pre:#0B0F17;--shadow:0 1px 2px rgba(11,15,23,.04),0 14px 44px rgba(11,15,23,.07);--mk:#7A6118;--hit:#9B3F4A;--hitbg:#F6E3E5;--cov1:#0B0F17;--cov2:#161F30;--cov3:#2A3550;--glow:rgba(212,175,55,.22);--b1:#E5C158;--b2:#B8962E;--bfg:#0B0F17;--btn1:#161F30;--btn2:#161F30;--btnfg:#F3E3A9;--tocon:#161F30;--tocfg:#F3E3A9;--aside:#FFFFFF;--stripe:#F8F9FB;--ring:rgba(11,15,23,.07);}
+:root[data-palette=executive][data-theme=dark]{--bg:#0B0F17;--card:#161F30;--ink:#EDEFF4;--mute:#9BA6BC;--line:#243049;--soft:#121A29;--soft2:#1D2740;--navy:#161F30;--thbg:#1D2740;--thfg:#E5C158;--teal:#E5C158;--accent:#D4AF37;--tealbg:#2A2614;--amber:#E5C158;--amberbg:#2B2614;--red:#E58C98;--redbg:#35202A;--green:#7FCBA6;--greenbg:#17302A;--blue:#8FB0E0;--bluebg:#1A2A48;--code:#1D2740;--codefg:#E8ECF5;--pre:#070A10;--shadow:0 1px 0 rgba(229,193,88,.05) inset,0 16px 40px rgba(2,4,10,.55);--mk:#E5C158;--hit:#E58C98;--hitbg:#35202A;--cov1:#070A10;--cov2:#161F30;--cov3:#2E3A57;--glow:rgba(212,175,55,.18);--b1:#E5C158;--b2:#B8962E;--bfg:#0B0F17;--btn1:#E5C158;--btn2:#B8962E;--btnfg:#0B0F17;--tocon:#1D2740;--tocfg:#E5C158;--aside:#0E1420;--stripe:#121A29;--ring:rgba(229,193,88,.06); color-scheme:dark}
+:root[data-palette=nordic]{--bg:#F4F6F4;--card:#FFFFFF;--ink:#1F2C26;--mute:#5E6D65;--line:#DDE4DF;--soft:#ECF0ED;--soft2:#E0E7E2;--navy:#2C3E35;--thbg:#2C3E35;--thfg:#F6EBDD;--teal:#35564A;--accent:#C99C78;--tealbg:#E4EDE8;--amber:#9A6A22;--amberbg:#F7EBD7;--red:#A2493E;--redbg:#F6E4DF;--green:#3F7A57;--greenbg:#E4F0E8;--blue:#4A6A80;--bluebg:#E5EDF2;--code:#E7EDE9;--codefg:#2C3E35;--pre:#1D2A24;--shadow:0 1px 2px rgba(31,44,38,.04),0 14px 44px rgba(31,44,38,.06);--mk:#35564A;--hit:#A2493E;--hitbg:#F6E4DF;--cov1:#1F2C26;--cov2:#2C3E35;--cov3:#4B6558;--glow:rgba(223,186,154,.26);--b1:#DFBA9A;--b2:#C99C78;--bfg:#2C3E35;--btn1:#2C3E35;--btn2:#2C3E35;--btnfg:#F6EBDD;--tocon:#2C3E35;--tocfg:#F6EBDD;--aside:#FFFFFF;--stripe:#F9FBF9;--ring:rgba(31,44,38,.07);}
+:root[data-palette=nordic][data-theme=dark]{--bg:#141C18;--card:#1C2721;--ink:#EEF2EE;--mute:#A3B2A9;--line:#2D3C34;--soft:#202D26;--soft2:#2A3A31;--navy:#2C3E35;--thbg:#2C3E35;--thfg:#F3E3CF;--teal:#9CC5B0;--accent:#DFBA9A;--tealbg:#22352C;--amber:#E4BE7C;--amberbg:#35301D;--red:#E59A8D;--redbg:#392421;--green:#97CDA8;--greenbg:#1F3526;--blue:#9DBCD0;--bluebg:#1F3040;--code:#2A3A31;--codefg:#EAF0EA;--pre:#0E1411;--shadow:0 1px 0 rgba(223,186,154,.04) inset,0 16px 40px rgba(2,6,4,.5);--mk:#DFBA9A;--hit:#E59A8D;--hitbg:#392421;--cov1:#0E1411;--cov2:#22322A;--cov3:#3E5649;--glow:rgba(223,186,154,.16);--b1:#DFBA9A;--b2:#C99C78;--bfg:#1D2A24;--btn1:#DFBA9A;--btn2:#C99C78;--btnfg:#1D2A24;--tocon:#2A3A31;--tocfg:#F3E3CF;--aside:#111813;--stripe:#1F2B24;--ring:rgba(223,186,154,.05); color-scheme:dark}
+
+.ai-calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:12px 0;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.ai-row{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--mute)}
+.ai-row input,.ai-row select{font:inherit;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--soft);color:var(--ink)}
+.ai-out{grid-column:1/-1;font-size:15px;padding:10px 12px;border-radius:12px;background:var(--tealbg);color:var(--ink)}
+.ai-out small{color:var(--mute);font-size:12.5px}
+
+/* ---- harmony ---- */
+:root{--alert:#A95A3F;--alertbg:#F8E6DC;--aink:#8F5E1E;}
+:root[data-theme=dark]{--alert:#E6967F;--alertbg:#3D2420;--aink:#E3B96C;}
+:root[data-palette=editorial]{--alert:#8A4B38;--alertbg:#F4E8E2;--aink:#7A6538;}
+:root[data-palette=editorial][data-theme=dark]{--alert:#D9A08A;--alertbg:#33241F;--aink:#D2BA89;}
+:root[data-palette=executive]{--alert:#9A5B2B;--alertbg:#F5EADF;--aink:#8A6A12;}
+:root[data-palette=executive][data-theme=dark]{--alert:#E0A878;--alertbg:#33261C;--aink:#E5C158;}
+:root[data-palette=nordic]{--alert:#A8624A;--alertbg:#F4E6DF;--aink:#8A6642;}
+:root[data-palette=nordic][data-theme=dark]{--alert:#E0A58E;--alertbg:#382621;--aink:#DFBA9A;}
+:root:root:root{--green:var(--teal);--greenbg:var(--tealbg);--blue:var(--teal);--bluebg:var(--soft);--amber:var(--aink);--amberbg:var(--soft);--red:var(--alert);--redbg:var(--alertbg);--hit:var(--alert);--hitbg:var(--alertbg)}
+.diff .a{background:var(--tealbg);color:var(--teal)}.diff .d{background:var(--alertbg);color:var(--alert)}
+:root[data-theme=dark] .diff .a{background:var(--tealbg);color:var(--teal)}:root[data-theme=dark] .diff .d{background:var(--alertbg);color:var(--alert)}
+.good{border-color:var(--teal)}.warn{border-color:var(--aink)}.bad{border-color:var(--alert)}
+.ba-f.bad{background:var(--alert)}.ba-f.good{background:var(--teal)}.ba-f.warnx{background:var(--aink)}
+:root[data-theme=dark] .ba-f.bad,:root[data-theme=dark] .ba-f.good,:root[data-theme=dark] .ba-f.warnx{color:#14110e}
+.ba-f.bad,.ba-f.good,.ba-f.warnx{color:#fff}
+/* backgrounds: each palette has its own surface treatment */
+body{background:var(--bgart,none),var(--bg);background-attachment:fixed,fixed}
+:root[data-palette=editorial]{--bgart:radial-gradient(circle at 1px 1px,var(--ring) 1px,transparent 0) 0 0/22px 22px}
+:root[data-palette=executive]{--bgart:radial-gradient(900px 520px at 88% -6%,var(--glow),transparent 62%),repeating-linear-gradient(135deg,var(--ring) 0 1px,transparent 1px 16px)}
+:root[data-palette=nordic]{--bgart:radial-gradient(700px 420px at 6% 10%,var(--glow),transparent 66%),radial-gradient(820px 520px at 96% 72%,var(--ring),transparent 66%)}
+:root[data-theme=dark] body{background:var(--bgart,radial-gradient(1000px 560px at 88% -8%,rgba(226,163,115,.10),transparent 62%)),var(--bg);background-attachment:fixed,fixed}
+@media print{body{background:#fff!important}}
+
+
+.wow{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:18px 0}
+.wt{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:16px 18px;box-shadow:var(--shadow)}
+.wl{font-size:13px;color:var(--mute)}
+.wn{display:flex;align-items:baseline;gap:8px;margin:6px 0 4px;direction:rtl;flex-wrap:nowrap;white-space:nowrap}
+.wb{font-size:clamp(18px,2.4vw,24px);font-weight:700;color:var(--mute);text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:var(--alert)}
+.wa{font-size:22px;color:var(--accent)}
+.wz{font-size:clamp(30px,3.8vw,42px);font-weight:800;color:var(--teal);line-height:1}
+.ws{font-size:13.5px;color:var(--ink)}
+.appx-head{display:flex;flex-direction:column;gap:4px;margin:46px 0 6px;padding:16px 20px;border:1px dashed var(--line);border-radius:14px;background:var(--soft)}
+.appx-head b{font-size:17px;color:var(--teal)}
+.appx-head span{font-size:13.5px;color:var(--mute)}
+
+a.xref{color:var(--teal);text-decoration:underline dotted;text-underline-offset:3px;font-weight:600;cursor:pointer}
+a.xref:hover{text-decoration-style:solid}
+#xback{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:80;padding:10px 18px;border-radius:999px;border:1px solid var(--line);background:var(--ink);color:var(--card);font:600 14px/1 inherit;box-shadow:var(--shadow);cursor:pointer}
+#xback[hidden]{display:none}
+.rule{border:1px solid var(--teal);border-radius:14px;background:var(--tealbg);padding:12px 16px;margin:12px 0;font-size:15px}
+.rule b{display:block;color:var(--teal);margin-bottom:3px;font-size:15.5px}
+@media print{#xback{display:none!important}a.xref{color:inherit;text-decoration:none}}
+
+/* ================= modern refresh ================= */
+body{font-family:"IBM Plex Sans Arabic","Segoe UI",Tahoma,"Noto Sans Arabic","Geeza Pro",Arial,sans-serif;font-size:16.5px;line-height:1.85}
+main section[data-s]{background:transparent;border:0;box-shadow:none;border-radius:0;margin:0;padding:64px 0 26px}
+main section[data-s]+section[data-s]{border-top:1px solid var(--line)}
+@media(min-width:1101px){main{padding:0 52px 110px}header.cover{margin:0 -52px}main section[data-s]{padding:80px 6px 30px;margin:0}}
+main section[data-s]>h2{font-size:clamp(26px,3.6vw,40px);font-weight:700;line-height:1.25;letter-spacing:-.01em;margin:0 0 12px;gap:16px}
+main section[data-s]>h2 .n{width:54px;height:54px;border-radius:17px;font-size:22px;box-shadow:0 12px 28px var(--ring)}
+main .lead{font-size:clamp(16.5px,1.6vw,19px);line-height:1.8;max-width:78ch}
+main h3{font-size:clamp(19px,2vw,24px);font-weight:700;color:var(--ink);border-inline-start:0;padding-inline-start:0;margin:44px 0 12px}
+main h3::before{content:"";display:inline-block;width:10px;height:10px;border-radius:4px;background:linear-gradient(135deg,var(--b1),var(--b2));margin-inline-end:12px;vertical-align:middle;position:relative;top:-2px}
+main h4{font-size:16.5px}
+.card,.stat,.wt,.fn,.br,.hist,.nc,.tl .ph,.ai-calc,figure.shot{border-radius:18px}
+.card,.stat,.wt{transition:transform .5s cubic-bezier(.16,1,.3,1),box-shadow .5s cubic-bezier(.16,1,.3,1)}
+@media(hover:hover){.card:hover,.stat:hover,.wt:hover{transform:translateY(-3px);box-shadow:0 2px 6px var(--ring),0 24px 56px var(--ring)}}
+.wt{padding:22px 22px 18px}
+.tw{border-radius:16px}
+th{background:var(--soft);color:var(--ink);font-weight:700;font-size:13.5px;border-bottom:1px solid var(--line)}
+.note,.warn,.good,.info,.bad,.rule{border-radius:16px;padding:16px 20px;border:1px solid var(--line);border-inline-start-width:3px}
+.note,.info,.good,.rule{border-inline-start-color:var(--teal)}.warn{border-inline-start-color:var(--aink)}.bad{border-inline-start-color:var(--alert)}
+.btn{border-radius:999px;padding:9px 18px;font-weight:600}
+.chip{font-weight:600}
+aside.side li a{border-radius:12px}
+#toc li.part{font-size:11.5px;font-weight:700;letter-spacing:.04em;color:var(--mute);margin:18px 12px 6px;padding:0}
+#toc li.part:first-child{margin-top:6px}
+.present-btn{width:100%;justify-content:center;margin:12px 0 4px}
+header.cover{padding:clamp(56px,9vw,104px) clamp(20px,5vw,60px) clamp(64px,9vw,112px);border-radius:0 0 36px 36px}
+header.cover h1{font-size:clamp(36px,6vw,70px);line-height:1.1;letter-spacing:-.02em;font-weight:700;margin:18px 0 16px}
+header.cover p{font-size:clamp(16px,1.7vw,19.5px);line-height:1.85;max-width:780px}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+header.cover .btn{border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.08);color:#fff}
+header.cover .btn:hover{background:rgba(255,255,255,.16)}
+header.cover .btn.pri,.cover .btn.pri{background:linear-gradient(135deg,var(--b1),var(--b2));color:var(--bfg);border-color:transparent}
+.roadmap{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:30px;max-width:980px}
+.roadmap a{display:flex;flex-direction:column;gap:2px;padding:14px 16px;border-radius:16px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#fff;text-decoration:none;transition:background .4s cubic-bezier(.16,1,.3,1),transform .4s cubic-bezier(.16,1,.3,1)}
+.roadmap a:hover{background:rgba(255,255,255,.13);transform:translateY(-2px)}
+.roadmap i{font-style:normal;font-size:12px;opacity:.75}
+.roadmap b{font-size:16px}
+.roadmap small{font-size:12.5px;opacity:.75;line-height:1.5}
+.appx-head{margin:70px 0 0}
+@media print{main section[data-s]{padding:18px 0 8px}.cta,.roadmap{display:none}}
+
+/* ================= presentation mode ================= */
+#pbar,#pProg{display:none}
+#btnPresent2{display:none}
+@media(max-width:900px){#btnPresent2{display:grid;place-items:center}}
+body.present{overflow:hidden}
+body.present .topbar,body.present aside.side,body.present #scrim,body.present #totop,body.present #prog,body.present #xback{display:none!important}
+body.present .layout{display:block;max-width:none}
+body.present main{position:fixed;inset:0;z-index:60;overflow:auto;padding:clamp(22px,5vh,60px) clamp(16px,6vw,110px) 120px;background:var(--bgart,none),var(--bg);font-size:18px}
+body.present section[data-s]{display:contents}
+body.present main .slide{display:none}
+body.present main .slide.cur{display:block;max-width:1180px;margin:0 auto;animation:pin .7s cubic-bezier(.16,1,.3,1)}
+@keyframes pin{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+body.present main h2{font-size:clamp(32px,4.4vw,56px)}
+body.present main h3{font-size:clamp(24px,2.8vw,34px);margin-top:6px}
+body.present header.cover{margin:0 0 26px!important;border-radius:28px}
+body.present .wz{font-size:clamp(46px,6.4vw,84px)}
+body.present .wb{font-size:clamp(22px,2.6vw,32px)}
+body.present #pbar{display:flex;position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:70;align-items:center;gap:2px;padding:6px 8px;border-radius:999px;background:var(--ink);color:var(--card);box-shadow:0 18px 50px rgba(0,0,0,.28);max-width:calc(100vw - 24px)}
+#pbar button{width:40px;height:40px;border:0;border-radius:50%;background:transparent;color:inherit;font:600 18px/1 inherit;cursor:pointer;display:grid;place-items:center}
+#pbar button:hover{background:rgba(127,127,127,.22)}
+#pbar button[hidden]{display:none}
+#pCount{min-width:74px;text-align:center;font-weight:700;font-size:14px;font-variant-numeric:tabular-nums;direction:ltr}
+#pTitle{max-width:34vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;opacity:.75;padding-inline:8px 12px}
+body.present #pProg{display:block;position:fixed;top:0;right:0;height:3px;width:0;background:linear-gradient(90deg,var(--b2),var(--b1));z-index:70;transition:width .5s cubic-bezier(.16,1,.3,1)}
+@media(max-width:700px){#pTitle{display:none}body.present main{font-size:16px;padding-bottom:110px}}
+@media print{#pbar,#pProg{display:none!important}}
+
+/* ---- related sections strip ---- */
+.related{margin:34px 0 4px;padding:16px 18px;border:1px dashed var(--line);border-radius:16px;background:var(--soft)}
+.related>b{display:block;font-size:13px;color:var(--mute);margin-bottom:10px;font-weight:600}
+.related>div{display:flex;flex-wrap:wrap;gap:8px}
+a.rel{display:inline-flex;align-items:center;gap:8px;padding:7px 14px 7px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);text-decoration:none;font-size:14px;font-weight:600;transition:transform .4s cubic-bezier(.16,1,.3,1),border-color .4s,background .4s}
+a.rel:hover{transform:translateY(-2px);border-color:var(--accent)}
+a.rel i{font-style:normal;display:inline-grid;place-items:center;min-width:24px;height:24px;padding:0 6px;border-radius:8px;background:linear-gradient(135deg,var(--b1),var(--b2));color:var(--bfg);font-size:12.5px;font-weight:700}
+main .warn a,main .note a,main .info a,main td a:not(.btn),main p a:not(.btn):not(.xref){color:var(--teal);text-decoration:underline dotted;text-underline-offset:3px;font-weight:600}
+
+/* ---- one-page summary ---- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+.kpis>div{border:1px solid var(--line);border-radius:16px;background:var(--card);padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.kpis b{font-size:clamp(20px,2.4vw,28px);color:var(--teal);line-height:1.2}
+.kpis span{font-size:13px;color:var(--mute);line-height:1.5}
+.use3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0}
+.use3 .card{display:flex;flex-direction:column;gap:4px;padding:18px 18px 16px;font-size:14.5px}
+.use3 i{font-style:normal;font-size:12.5px;color:var(--accent);font-weight:700}
+.use3 b{font-size:18px}
+body.present .kpis b{font-size:clamp(26px,3vw,36px)}
+.kpis b .en,.wz .en,.wb .en{font-family:inherit;font-size:1em}
+.use3 .card p{margin:4px 0 0;color:var(--ink)}
+
+/* ---- journey rows: peak -> drop -> last run -> now ---- */
+.journey{display:flex;flex-direction:column;gap:14px;margin:18px 0}
+.jr{display:grid;grid-template-columns:118px repeat(4,minmax(0,1fr));gap:14px;align-items:stretch}
+.jh{display:flex;flex-direction:column;justify-content:center;gap:2px;padding:14px 16px;border-radius:16px;background:linear-gradient(135deg,var(--cov1),var(--cov3));color:#fff}
+.jh b{font-size:22px;line-height:1.2}
+.jh small{font-size:11px;opacity:.75;direction:ltr;text-align:end}
+.js{position:relative;border:1px solid var(--line);border-radius:16px;background:var(--card);padding:14px 16px;display:flex;flex-direction:column;gap:4px;box-shadow:var(--shadow);min-width:0}
+.js i{font-style:normal;font-size:12.5px;color:var(--mute);font-weight:600}
+.js b{font-size:clamp(20px,2.3vw,30px);font-weight:800;color:var(--ink);line-height:1.2;white-space:nowrap;direction:rtl}
+.js small{font-size:12.5px;color:var(--mute);line-height:1.5}
+.js.peak b{color:var(--alert)}
+.js.now{border-color:var(--teal);background:var(--tealbg)}
+.js.now b{color:var(--teal);font-size:clamp(26px,3vw,38px)}
+.js:not(:last-child)::after{content:"←";position:absolute;left:-7px;top:50%;transform:translate(-50%,-50%);color:var(--accent);font-weight:800;font-size:18px;z-index:2}
+.cnt{font-variant-numeric:tabular-nums}
+.en-sub{direction:ltr;text-align:right;font-size:clamp(14px,1.6vw,18px)!important;letter-spacing:.08em;text-transform:uppercase;opacity:.7;margin:-6px 0 14px!important}
+@media(max-width:900px){.jr{grid-template-columns:1fr 1fr}.jh{grid-column:1/-1;flex-direction:row;justify-content:space-between;align-items:center}.js:not(:last-child)::after{display:none}}
+.home{cursor:pointer}
+/* ---- collapsible parts in the sidebar ---- */
+#toc li.part{margin:14px 4px 4px}
+#toc .pt{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;border:0;border-radius:10px;background:transparent;color:var(--mute);font:700 11.5px/1.4 inherit;letter-spacing:.04em;cursor:pointer}
+#toc .pt:hover{background:var(--soft)}
+#toc .pt i{font-style:normal;transition:transform .35s cubic-bezier(.16,1,.3,1)}
+#toc li.closed .pt i{transform:rotate(90deg)}
+#toc li[hidden]{display:none}
+/* ---- motion that explains (off for reduced motion and in print) ---- */
+.anim-on .rv{opacity:0;transform:translateY(18px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1);transition-delay:var(--d,0ms)}
+.anim-on .rv.in{opacity:1;transform:none}
+.anim-on .jr .js{opacity:0;transform:translateY(14px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+.anim-on .jr.in .js{opacity:1;transform:none}
+.anim-on .jr.in .js:nth-child(3){transition-delay:.18s}.anim-on .jr.in .js:nth-child(4){transition-delay:.36s}.anim-on .jr.in .js:nth-child(5){transition-delay:.54s}
+.anim-on .jr.in .js.now{animation:nowGlow 2.8s ease-in-out 1.2s 2}
+@keyframes nowGlow{50%{box-shadow:0 0 0 6px var(--ring),var(--shadow)}}
+@media(hover:hover){.anim-on .card.rv.in:hover,.anim-on .stat.rv.in:hover,.anim-on .wt.rv.in:hover{transform:translateY(-3px)}}
+.anim-on .ba.in .ba-f{animation:grow 1.4s cubic-bezier(.16,1,.3,1) both}
+@keyframes grow{from{width:0;min-width:0}}
+.anim-on .nc.in .nc-new{animation:ncgrow 1.6s cubic-bezier(.16,1,.3,1) .2s both}
+@keyframes ncgrow{from{flex-grow:0;opacity:.3}}
+.anim-on .nc-base{animation:basePulse 2.6s ease-in-out infinite}
+@keyframes basePulse{50%{box-shadow:0 0 0 6px var(--ring)}}
+.anim-on .fa{animation:nudge 1.8s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateX(-5px)}}
+@keyframes nudgeY{50%{transform:translateY(4px)}}
+@media(max-width:700px){.anim-on .fa{animation-name:nudgeY}}
+.anim-on .hist circle{opacity:0;transition:opacity .5s ease 1.4s}
+.anim-on .hist.in circle{opacity:1}
+@media print{.anim-on .rv,.anim-on .jr .js,.anim-on .hist circle{opacity:1!important;transform:none!important;transition:none!important;animation:none!important}.hist polyline{stroke-dashoffset:0!important;stroke-dasharray:none!important}}
+#toc .pt i{font-size:15px;line-height:1;color:var(--accent)}
+
+/* ---- numbers everywhere: cover strip and per-step metrics ---- */
+.cnums{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:22px 0 6px;max-width:980px}
+.cnums>div{padding:12px 14px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);display:flex;flex-direction:column;gap:2px}
+.cnums b{font-size:clamp(17px,1.9vw,22px);color:#fff;white-space:nowrap}
+.cnums span{font-size:12.5px;color:rgba(255,255,255,.72);line-height:1.45}
+.cnums .en{font-family:inherit;font-size:1em}
+@media(max-width:900px){.cnums{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.mx{list-style:none;margin:8px 0 0;padding:8px 0 0;border-top:1px dashed var(--line);display:grid;grid-template-columns:1fr 1fr;gap:4px 10px}
+.mx li{display:flex;flex-direction:column;min-width:0}
+.mx em{font-style:normal;font-size:11.5px;color:var(--mute)}
+.mx span{font-size:13.5px;font-weight:700;color:var(--ink);white-space:nowrap}
+.mx .en{font-family:inherit;font-size:1em}
+.js.now .mx span{color:var(--teal)}
+/* ---- quality-gate background: one faint gauge in the pass zone ---- */
+:root[data-palette]{--bgart:radial-gradient(900px 500px at 90% -6%,var(--ring),transparent 60%)}
+body.present main{background:transparent}
+@media print{body::after{display:none}}
+.cnums{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media(max-width:1100px){.cnums{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){.cnums{grid-template-columns:repeat(2,minmax(0,1fr))}}
+tr.hl td{background:var(--tealbg)!important;font-weight:700}
+.kpis b span{font-size:inherit;color:inherit;line-height:inherit}
+.cnums b span{color:inherit;font-size:inherit}
+.mx{grid-template-columns:1fr;gap:3px}
+.mx li{flex-direction:row;justify-content:space-between;align-items:baseline;gap:8px}
+.mx span{font-size:13px}
+th code,th .en{background:var(--code)!important;color:var(--codefg)!important}
+
+/* ---- cover: code -> pipeline -> quality gate -> passed ---- */
+header.cover{position:relative;overflow:hidden}
+header.cover>*:not(.gate-art){position:relative;z-index:1}
+.gate-art{position:relative;display:block;width:min(600px,100%);height:auto;margin:20px 0 8px;opacity:.95}
+.gate-art .ga-panel{stroke:rgba(255,255,255,.35);stroke-width:2;fill:rgba(255,255,255,.04)}
+.gate-art .ga-fill{fill:rgba(255,255,255,.35);stroke:none}
+.gate-art .ga-code{stroke:rgba(255,255,255,.45);stroke-width:5}
+.gate-art .ga-flow{stroke:rgba(255,236,214,.7);stroke-width:3;stroke-dasharray:4 9}
+.gate-art .ga-node{fill:var(--b1);stroke:none}
+.gate-art .ga-gate{stroke:var(--b1);stroke-width:7}
+.gate-art .ga-bar{stroke:rgba(255,236,214,.55);stroke-width:3}
+.gate-art .ga-pass{stroke:var(--b1);stroke-width:4;fill:rgba(255,255,255,.06)}
+.gate-art .ga-check{stroke:#fff;stroke-width:5}
+.gate-art .ga-t{fill:rgba(255,255,255,.62);stroke:none;font:600 12px/1 "IBM Plex Sans Arabic","Segoe UI",sans-serif;text-anchor:middle;direction:ltr}
+.gate-art .ga-tb{fill:#fff;font-size:13.5px;font-weight:700}
+.anim-on .gate-art .ga-flow{animation:gaFlow 1.6s linear infinite}
+@keyframes gaFlow{to{stroke-dashoffset:-26}}
+.anim-on .gate-art .ga-pass{animation:gaPulse 2.8s ease-in-out infinite;transform-origin:338px 114px;transform-box:view-box}
+@keyframes gaPulse{50%{stroke-width:7}}
+
+@media print{.gate-art{width:380px}}
+
+
+/* ---- animated background: code flows through quality gates ---- */
+.bg-gates{position:fixed;inset:0;z-index:-1;pointer-events:none;color:var(--accent);opacity:.16}
+:root[data-theme=dark] .bg-gates{opacity:.2}
+.bg-gates svg{width:100%;height:100%}
+.bg-gates .ln{stroke:currentColor;stroke-width:2;stroke-dasharray:6 14;animation:bgFlow 3s linear infinite}
+.bg-gates .gt{stroke:currentColor;stroke-width:6;stroke-linecap:round}
+.bg-gates .ck{stroke:currentColor;stroke-width:4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.bg-gates .cd{stroke:currentColor;stroke-width:5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.bg-gates .pk{fill:currentColor;animation:bgPkt 16s linear infinite}
+.bg-gates .pk.b{animation-duration:21s;animation-delay:-7s}.bg-gates .pk.c{animation-duration:18s;animation-delay:-12s}
+.bg-gates .ok{animation:bgOk 3.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes bgFlow{to{stroke-dashoffset:-40}}
+@keyframes bgPkt{from{transform:translateX(-120px)}to{transform:translateX(1720px)}}
+@keyframes bgOk{50%{transform:scale(1.15);opacity:.6}}
+@media print{.bg-gates{display:none}}
+.bg-gates .ln,.bg-gates .ok{animation:none!important}.bg-gates .pk{display:none}
+
+/* presentation bar: fixed width, previous on the left, next on the right */
+body.present #pbar{direction:ltr;width:min(600px,calc(100vw - 24px));max-width:none;justify-content:space-between;gap:4px}
+#pTitle{flex:1;min-width:0;max-width:none;direction:rtl;text-align:center}
+#pCount{flex:none}
+#pbar .pnav{width:46px;height:46px;font-size:22px;background:rgba(127,127,127,.18)}
+@media(max-width:700px){#pTitle{display:none}body.present #pbar{width:min(360px,calc(100vw - 24px))}}
+
+/* ---- presentation sized for laptop screens ---- */
+body.present.measuring main .slide{display:block;position:relative}
+body.present main .slide{position:relative}
+body.present main{font-size:clamp(14px,.55vw + .9vh,18px);padding:clamp(14px,3.2vh,44px) clamp(16px,5vw,96px) 92px;line-height:1.75}
+body.present main h2{font-size:clamp(24px,1.6vw + 1.8vh,48px);margin-bottom:8px}
+body.present main h2 .n{width:clamp(38px,5vh,54px);height:clamp(38px,5vh,54px);font-size:clamp(16px,2.2vh,22px)}
+body.present main h3{font-size:clamp(19px,1vw + 1.4vh,32px);margin:0 0 10px}
+body.present main .lead{font-size:clamp(15px,.6vw + 1vh,19px)}
+body.present header.cover{padding:clamp(24px,5vh,64px) clamp(20px,4vw,56px)!important}
+body.present header.cover h1{font-size:clamp(30px,2.4vw + 3vh,66px);margin:8px 0}
+body.present header.cover p{font-size:clamp(14px,.6vw + 1vh,19px)}
+body.present .gate-art{width:auto;height:clamp(120px,26vh,240px);max-width:100%;margin:10px 0}
+body.present .roadmap{margin-top:16px}
+body.present .wz{font-size:clamp(30px,2vw + 3vh,70px)}
+body.present .js b{font-size:clamp(18px,1vw + 1.8vh,32px)}
+body.present .kpis b{font-size:clamp(20px,1vw + 2vh,34px)}
+body.present .journey{gap:10px;margin:10px 0}
+body.present .js{padding:10px 14px}
+body.present figure.shot img{max-height:64vh;width:auto;max-width:100%;margin:0 auto}
+.cont-tag{display:inline-block;font-size:13px;font-weight:700;color:var(--mute);border:1px dashed var(--line);border-radius:999px;padding:3px 12px;margin-bottom:10px}
+
+.stk[hidden],tr[hidden]{display:none!important}
+.stk{margin:10px 0}
+.mermaid{direction:ltr;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin:12px 0;overflow:auto}
+.mmd-wrap{position:relative}
+.mmd-max{position:absolute;top:10px;inset-inline-start:10px;z-index:2}
+#mmdLb{position:fixed;inset:0;z-index:95;display:none;background:rgba(6,10,22,.92)}
+#mmdLb.on{display:block}
+#mmdBar{position:absolute;top:12px;inset-inline-end:12px;display:flex;gap:8px;z-index:2}
+#mmdStage{position:absolute;inset:64px 16px 16px;overflow:hidden;cursor:grab;touch-action:none}
+#mmdLb .btn{background:#fff;color:#111}
+</style>
+</head>
+<body>
+
+<div class="bg-gates" aria-hidden="true"><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice"><path class="cd" d="M60 138 L36 160 L60 182 M110 138 L134 160 L110 182 M94 132 L76 188"/><path class="ln" d="M160 160 H1600"/><path class="gt" d="M980 100 V220 M1032 100 V220 M972 114 H1040"/><g class="ok"><circle class="ck" cx="1120" cy="160" r="24"/><path class="ck" d="M1108 161 L1117 170 L1133 152"/></g><path class="cd" d="M60 448 L36 470 L60 492 M110 448 L134 470 L110 492 M94 442 L76 498"/><path class="ln" d="M160 470 H1600"/><path class="gt" d="M520 410 V530 M572 410 V530 M512 424 H580"/><g class="ok"><circle class="ck" cx="660" cy="470" r="24"/><path class="ck" d="M648 471 L657 480 L673 462"/></g><path class="cd" d="M60 758 L36 780 L60 802 M110 758 L134 780 L110 802 M94 752 L76 808"/><path class="ln" d="M160 780 H1600"/><path class="gt" d="M1180 720 V840 M1232 720 V840 M1172 734 H1240"/><g class="ok"><circle class="ck" cx="1320" cy="780" r="24"/><path class="ck" d="M1308 781 L1317 790 L1333 772"/></g><circle class="pk" cx="0" cy="160" r="7"/><circle class="pk b" cx="0" cy="470" r="7"/><circle class="pk c" cx="0" cy="780" r="7"/></svg></div>
+<div id="prog" class="noprint"><i></i></div>
+<div class="topbar noprint">
+<button id="btnMenu" type="button" aria-label="فتح القائمة" aria-expanded="false">☰</button>
+<b class="home" title="إلى أول الصفحة">دليل التطبيق</b>
+<button id="btnPresent2" type="button" data-present aria-label="وضع العرض">▶</button>
+<button id="btnTheme2" type="button" aria-label="تبديل الوضع الليلي">◐</button>
+</div>
+<div id="scrim" class="noprint"></div>
+<button id="totop" type="button" class="noprint" aria-label="إلى الأعلى">↑</button>
+<button id="lbx" type="button" aria-label="إغلاق">✕</button>
+
+<div class="layout">
+
+
+<aside class="side noprint" id="side">
+<div class="brand home" title="إلى أول الصفحة"><div class="lg">SQ</div><b>دليل التطبيق<small>أي منتج · أي لغة</small></b></div>
+<ol id="toc"></ol>
+<a class="btn pri" href="SonarQube_Guide_AR_v2.html" style="display:block;text-align:center;margin:8px 0">← الدليل الشامل لـ SonarQube</a>
+<div class="pal noprint" id="pal"><span>الألوان</span><button type="button" data-pal="editorial" title="تحريري هادئ" style="background:linear-gradient(135deg,#FBFBFA 50%,#8C7853 50%)"></button><button type="button" data-pal="executive" title="تنفيذي فاخر" style="background:linear-gradient(135deg,#161F30 50%,#D4AF37 50%)"></button><button type="button" data-pal="nordic" title="شمالي هادئ" style="background:linear-gradient(135deg,#2C3E35 50%,#DFBA9A 50%)"></button><button type="button" data-pal="warm" title="دافئ" style="background:linear-gradient(135deg,#4a3c31 50%,#c07440 50%)"></button></div>
+<button type="button" class="btn pri present-btn" data-present>▶ وضع العرض التقديمي</button>
+<div class="sidebtn"><button class="btn" id="btnPrint" type="button">طباعة / PDF</button><button class="btn" id="btnTheme" type="button">◐ الوضع الليلي</button></div>
+</aside>
+
+
+<main>
+<header class="cover">
+
+<div class="kick">دليل التطبيق · أي منتج وأي لغة</div>
+<h1>المهارات وخطوات التنفيذ</h1>
+<p>كيف نأخذ ما بنيناه حول SonarQube في EP و Admin ونطبّقه على أي منتج وأي لغة: نواة ثابتة لا تتغير، ومهايئات صغيرة لكل لغة، وخطوات مرتبة لكل خطوة ناتج وشرط اكتمال.</p>
+<svg class="gate-art" viewBox="0 0 380 230" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round">
+<rect x="8" y="58" width="118" height="112" rx="14" class="ga-panel"/>
+<path d="M22 58 V58" class="ga-dim"/>
+<circle cx="24" cy="74" r="3" class="ga-fill"/><circle cx="36" cy="74" r="3" class="ga-fill"/><circle cx="48" cy="74" r="3" class="ga-fill"/>
+<path d="M24 96 H86 M34 112 H106 M34 128 H78 M24 144 H96" class="ga-code"/>
+<path d="M134 114 H222" class="ga-flow"/>
+<circle cx="160" cy="114" r="6" class="ga-node"/><circle cx="194" cy="114" r="6" class="ga-node"/>
+<text x="160" y="96" class="ga-t">build</text><text x="194" y="140" class="ga-t">scan</text>
+<path d="M232 46 V182 M282 46 V182 M226 58 H288" class="ga-gate"/>
+<path d="M232 114 H282" class="ga-bar"/>
+<text x="257" y="36" class="ga-t ga-tb">Quality Gate</text>
+<path d="M290 114 H312" class="ga-flow"/>
+<circle cx="338" cy="114" r="26" class="ga-pass"/>
+<path d="M326 115 L335 124 L351 105" class="ga-check"/>
+<text x="338" y="164" class="ga-t ga-tb">Passed</text>
+<text x="257" y="208" class="ga-t">0 new issues · 80% · 3%</text>
+</svg>
+<p class="meta">هذا الدليل مكمّل لـ <a href="SonarQube_Guide_AR_v2.html" style="color:#f6cf9f">دليل SonarQube الشامل</a> الذي يشرح الشاشات والأرقام وما فعلناه. لا يحتوي هذا الملف أي توكن أو سر.</p>
+<div class="cta noprint"><button type="button" class="btn pri" data-present data-top>▶ ابدأ العرض التقديمي</button><a class="btn" href="SonarQube_Guide_AR_v2.html">← الدليل الشامل</a></div>
+</header>
+
+<div class="info"><b>ما الذي تم التحقق منه وما الذي هو اقتراح</b>
+كل ما يخص EP و Admin (السكربتات، المهارات، الـ pipeline، القراءة من السيرفر) نُفِّذ وجُرِّب. أما التطبيق على لغات أخرى فهو <b>تصميم مقترح</b> مبني على معاملات SonarQube القياسية لكل لغة، ولم يُجرَّب لدينا بعد؛ ولذلك تحمل مرحلة التجربة (الخطوة 8) شرطًا صريحًا قبل التعميم.</div>
+
+<!-- ========================= 1 ========================= -->
+<section data-s="b1" data-part="" data-t="الفكرة وفهرس المهارات">
+<h2 id="b1"><span class="n">1</span>الفكرة: نواة ثابتة ومهايئات، وفهرس المهارات</h2>
+<p class="lead">ما يصلح لأي مشروع هو <b>الحلقة</b>: امسح، اقرأ السيرفر، أصلح أو اقبل بسبب، أعد، حتى الصفر. أما ما يتغير من لغة إلى أخرى فهو <b>كيف تبني وكيف تُنتج تقرير التغطية وأي ماسح تستخدم</b>. نفصل الاثنين.</p>
+<div class="lane2 m"><h4>النواة · واحدة لكل المشاريع</h4>
+<div class="flow">
+<div class="fn key"><b>حلقة الصفر</b><small>sonar-server-scan</small></div><span class="fa"></span>
+<div class="fn key"><b>MCP للقراءة</b><small>4 أدوات قراءة فقط</small></div><span class="fa"></span>
+<div class="fn key"><b>بوابات الـ commit والمراجعة</b><small>hooks + technical-review</small></div>
+</div></div>
+<div class="vlink">يستدعي المهايئ المناسب</div>
+<div class="lane2 c"><h4>المهايئ · واحد لكل لغة</h4>
+<div class="flow">
+<div class="fn warnb"><b>.NET</b><small>dotnet-sonarscanner + OpenCover</small></div>
+<div class="fn warnb"><b>JavaScript / TypeScript</b><small>sonar-scanner + lcov</small></div>
+<div class="fn warnb"><b>Java</b><small>Maven أو Gradle + JaCoCo</small></div>
+<div class="fn warnb"><b>Python</b><small>sonar-scanner + Cobertura</small></div>
+</div></div>
+<div class="grid2">
+<div class="good"><b>لماذا هذا الفصل؟</b>لأن إضافة لغة جديدة تصبح كتابة مهايئ واحد (أمر البناء وأمر التغطية ومسار التقرير) بدل نسخ المنظومة كلها.</div>
+<div class="warn"><b>ما لا يتغير أبدًا</b>التوكن في متغير بيئة مستخدم فقط، قراءة السيرفر بعد كل مسح، وكل استثناء له سبب مكتوب.</div>
+</div>
+
+<h3 id="b2">1.1 فهرس المهارات: أيها عامّ وأيها خاص</h3>
+
+<p>كل مهارة وسكربت عندنا يقع في واحدة من ثلاث خانات. هذا التصنيف هو ما يحدد ما يدخل الحزمة المشتركة وما يبقى في المستودع (التفصيل والأسباب في القسم 3).</p>
+<div class="chips noprint" id="pbchips"><button class="chip on" data-g="all">الكل</button><button class="chip" data-g="gen">عامّ لأي لغة</button><button class="chip" data-g="stk">يحتاج مهايئ</button><button class="chip" data-g="prj">خاص بمشروعنا</button></div>
+<table id="pbtable">
+<tr><th>المهارة أو السكربت</th><th>التصنيف</th><th>ما يتغير عند لغة أخرى</th></tr>
+<tr data-g="gen"><td class="k"><code>sonar-server-scan</code></td><td>عامّ (الحلقة)</td><td>أمر المسح يأتي من المهايئ؛ الحلقة وقواعد الاستثناء كما هي.</td></tr>
+<tr data-g="gen"><td class="k"><code>sonarqube-rest</code> MCP</td><td>عامّ</td><td>لا شيء؛ يقرأ من السيرفر أي لغة.</td></tr>
+<tr data-g="gen"><td class="k"><code>sonarqube-duplication-*</code> (3 مهارات + اثنتان للتحليل)</td><td>عامّ</td><td>تعمل على بيانات السيرفر لأي لغة، ولا تحتاج إلا عنوان السيرفر والمفتاح والتوكن.</td></tr>
+<tr data-g="gen"><td class="k"><code>discover-code-duplication-and-complexity</code></td><td>عامّ للقراءة</td><td>موجّهة لـ Angular/TypeScript و.NET؛ تحتاج توسيع الأنماط للغات أخرى.</td></tr>
+<tr data-g="stk"><td class="k"><code>sonarqube-check</code></td><td>يحتاج مهايئ</td><td>وضع MCP عامّ؛ المسح الكامل <code>dotnet-sonarscanner</code> لـ .NET و<code>sonar-scanner</code> لغيره (حسب وصف المهارة).</td></tr>
+<tr data-g="stk"><td class="k"><code>tools/sonar/scan-server.sh</code></td><td>يحتاج مهايئ</td><td>يبدأ ويبني ويختبر ويُنهي؛ تتغير الأوامر الثلاثة الوسطى بحسب اللغة.</td></tr>
+<tr data-g="stk"><td class="k"><code>sonar-local-fix</code> + <code>check-changed.sh</code></td><td>يحتاج مهايئ</td><td>مبنيان على <span class="en">SonarAnalyzer.CSharp</span>؛ للغات الأخرى يُستبدل الفحص المحلي بما يناسبها.</td></tr>
+<tr data-g="stk"><td class="k"><code>technical-review</code></td><td>مراجعة كود، ليست Sonar</td><td>قائمة جودة الملف. شرط Sonar الوحيد فيها فحص الحزمة، ولا تقرأ السيرفر. القائمة الحالية لـ .NET وتُكتب لكل منصة.</td></tr>
+<tr data-g="stk"><td class="k"><code>sonar.globalconfig</code> + مولّده</td><td>خاص بـ .NET</td><td>ملف محلل Roslyn؛ لا مقابل مباشر له في اللغات الأخرى.</td></tr>
+<tr data-g="prj"><td class="k"><code>sonar.json</code> و<code>coverlet.runsettings</code> وملف الـ pipeline</td><td>خاص بكل مستودع</td><td>يُكتب لكل مشروع بمفتاحه ومساره.</td></tr>
+</table>
+
+<h4>الإرشادات نفسها كمهارة</h4>
+<p>التعليمات التي نشرحها للزملاء (ماذا نفعل بعد مسح فاشل، متى نستثني، كيف نبلّغ) تُكتب مرة واحدة كمهارة <code>SKILL.md</code> داخل الحزمة. بذلك تصل الإرشادات مع الأدوات نفسها وتتحدث معها، بدل وثيقة منفصلة تتقادم. قالب جاهز في القسم 4.</p>
+</section>
+
+<section data-s="b3" data-part="" data-t="خطوات التنفيذ والمهايئات">
+<h2 id="b3"><span class="n">2</span>خطوات التنفيذ والمهايئات حسب اللغة</h2>
+<p>تسع خطوات. لكل خطوة ناتج وشرط اكتمال، ولا ننتقل قبل تحققه. (التقدم يُحفظ في متصفحك فقط.)</p>
+<div class="tl">
+<div class="ph"><span class="pn">1</span><b>الوصول إلى السيرفر</b>توكن مستخدم للقراءة في متغير البيئة <code>SONAR_TOKEN</code> على جهاز كل عضو.<em>الاكتمال: <code>/api/system/status</code> يردّ بنجاح، ولا توكن في أي ملف</em></div>
+<div class="ph"><span class="pn">2</span><b>مفتاح المشروع</b>اتفاق على <code>projectKey</code> واسم المشروع على السيرفر.<em>الاكتمال: المفتاح مسجَّل في جدول المشاريع</em></div>
+<div class="ph"><span class="pn">3</span><b>المهايئ</b>اختيار أمر البناء وأمر الاختبار والماسح من جدول القسم 2.2.<em>الاكتمال: بناء نظيف محليًّا</em></div>
+<div class="ph"><span class="pn">4</span><b>تقرير التغطية</b>إنتاج التقرير بالصيغة التي تقرؤها اللغة، وإعطاء المسار للماسح.<em>الاكتمال: ملف التقرير موجود وغير فارغ</em></div>
+<div class="ph"><span class="pn">5</span><b>الـ pipeline</b>خطوات: تحضير، بناء، اختبار بتغطية، تحليل؛ الاختبار قبل التحليل.<em>الاكتمال: السجل يذكر استيراد التقرير</em></div>
+<div class="ph"><span class="pn">6</span><b>المهارات و MCP</b>تثبيت الحزمة المشتركة، وربط MCP بالقراءة.<em>الاكتمال: <code>sonar_quality_gate</code> يعيد حالة البوابة</em></div>
+<div class="ph"><span class="pn">7</span><b>أول مسح وحلقة الصفر</b>ارفع بالأمر أو بالـ pipeline، ثم أصلح أو استثنِ بسبب حتى 5 جولات. الفرق عن الحزمة في الدليل الشامل.<em>الاكتمال: 0 مفتوحة أو تقرير بالمتبقي وسببه</em></div>
+<div class="ph"><span class="pn">8</span><b>تجربة قبل التعميم</b>نطبّق على مشروع واحد من لغة جديدة ونسجّل ما اختلف.<em>الاكتمال: دورة كاملة نظيفة موثّقة</em></div>
+<div class="ph"><span class="pn">9</span><b>العادة اليومية</b>الحزمة قبل الـ commit. البوابة تُحسب بعد النشر.<em>الاكتمال: الكود الجديد يمرّ البوابة بلا تدخل</em></div>
+</div>
+<div class="warn"><b>تنبيه Community Build</b>كل مسح يستبدل العرض الرئيسي للمشروع لأن تحليل الفروع غير متاح. اتفقوا على pipeline واحد يُنشر منه (عندنا staging بحسب ممارسة الفريق) قبل الخطوة 5. الشرح الكامل في <a href="SonarQube_Guide_AR_v2.html#g-limits">حدود Community في الدليل الشامل</a>.</div>
+
+<h3>2.1 خريطة القرار: هل يصلح مشروعي؟</h3>
+<div class="dq">هل لدينا سيرفر SonarQube وتوكن قراءة؟</div>
+<div class="brs">
+<div class="br"><h5>لا</h5>ابدأ بالخطوة 1: لا شيء يعمل بدون سيرفر وتوكن.</div>
+<div class="br"><h5 class="y">نعم</h5>هل لغة المشروع مدعومة بمحلل؟ راجع قائمة اللغات في صفحة إصدارات Sonar.</div>
+</div>
+<div class="flow">
+<div class="fn"><b>لغة مدعومة؟</b><small>نعم ← تابع</small></div><span class="fa"></span>
+<div class="fn"><b>هل تُنتج الاختبارات تقرير تغطية؟</b><small>لا ← أضف أداة التغطية أولًا</small></div><span class="fa"></span>
+<div class="fn"><b>هل يوجد pipeline؟</b><small>لا ← نفّذ المسح يدويًّا بالسكربت</small></div><span class="fa"></span>
+<div class="fn ok"><b>طبّق الخطوات 3 إلى 7</b></div>
+</div>
+
+<h3 id="b4">2.2 جدول المهايئات حسب اللغة</h3>
+
+<p>اختر اللغة لترى ما يلزم. أسماء المعاملات من توثيق SonarQube القياسي؛ راجع صفحة توثيق إصدار السيرفر لديكم قبل الاعتماد.</p>
+<div class="chips noprint" id="stkchips"><button class="chip on" data-st="net">.NET</button><button class="chip" data-st="js">JavaScript / TypeScript</button><button class="chip" data-st="java">Java</button><button class="chip" data-st="py">Python</button></div>
+
+<div class="stk" data-st="net">
+<table>
+<tr><th>البند</th><th>القيمة</th></tr>
+<tr><td class="k">الماسح</td><td><code>dotnet-sonarscanner</code> (أداة عامة، يحتاج Java 17+)</td></tr>
+<tr><td class="k">صيغة التغطية</td><td>OpenCover عبر coverlet</td></tr>
+<tr><td class="k">معامل المسار</td><td><code>sonar.cs.opencover.reportsPaths</code></td></tr>
+<tr><td class="k">فحص محلي</td><td><span class="en">SonarAnalyzer.CSharp</span> مثبّت على إصدار إضافة السيرفر (إلزامي في الـ hook)، و SonarQube for VS Code أثناء الكتابة (مساعد)</td></tr>
+<tr><td class="k">مجرَّب لدينا</td><td>نعم: EP و Admin</td></tr>
+</table>
+<pre>dotnet sonarscanner begin /k:"KEY" /d:sonar.host.url="URL" /d:sonar.token="$SONAR_TOKEN" \
+  /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
+dotnet build
+dotnet test --collect:"XPlat Code Coverage" --settings coverlet.runsettings
+dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"</pre>
+</div>
+
+<div class="stk" data-st="js" hidden>
+<table>
+<tr><th>البند</th><th>القيمة</th></tr>
+<tr><td class="k">الماسح</td><td><code>sonar-scanner</code> (سطر الأوامر)</td></tr>
+<tr><td class="k">صيغة التغطية</td><td>lcov من أداة الاختبار (jest أو karma)</td></tr>
+<tr><td class="k">معامل المسار</td><td><code>sonar.javascript.lcov.reportPaths</code></td></tr>
+<tr><td class="k">فحص محلي</td><td>SonarQube for IDE في الوضع المتصل (يحتاج توكن مستخدم)</td></tr>
+<tr><td class="k">مجرَّب لدينا</td><td>لا: تصميم مقترح</td></tr>
+</table>
+<pre>npm test -- --coverage
+sonar-scanner -Dsonar.projectKey=KEY -Dsonar.host.url=URL \
+  -Dsonar.token=$SONAR_TOKEN \
+  -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info</pre>
+</div>
+
+<div class="stk" data-st="java" hidden>
+<table>
+<tr><th>البند</th><th>القيمة</th></tr>
+<tr><td class="k">الماسح</td><td>مكوّن Maven أو مهمة Gradle</td></tr>
+<tr><td class="k">صيغة التغطية</td><td>JaCoCo بصيغة XML</td></tr>
+<tr><td class="k">معامل المسار</td><td><code>sonar.coverage.jacoco.xmlReportPaths</code></td></tr>
+<tr><td class="k">فحص محلي</td><td>SonarQube for IDE في الوضع المتصل</td></tr>
+<tr><td class="k">مجرَّب لدينا</td><td>لا: تصميم مقترح</td></tr>
+</table>
+<pre>mvn verify sonar:sonar -Dsonar.projectKey=KEY -Dsonar.host.url=URL \
+  -Dsonar.token=$SONAR_TOKEN \
+  -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml</pre>
+</div>
+
+<div class="stk" data-st="py" hidden>
+<table>
+<tr><th>البند</th><th>القيمة</th></tr>
+<tr><td class="k">الماسح</td><td><code>sonar-scanner</code> (سطر الأوامر)</td></tr>
+<tr><td class="k">صيغة التغطية</td><td>Cobertura XML (coverage.py أو pytest-cov)</td></tr>
+<tr><td class="k">معامل المسار</td><td><code>sonar.python.coverage.reportPaths</code></td></tr>
+<tr><td class="k">فحص محلي</td><td>SonarQube for IDE في الوضع المتصل</td></tr>
+<tr><td class="k">مجرَّب لدينا</td><td>لا: تصميم مقترح</td></tr>
+</table>
+<pre>pytest --cov=. --cov-report=xml
+sonar-scanner -Dsonar.projectKey=KEY -Dsonar.host.url=URL \
+  -Dsonar.token=$SONAR_TOKEN \
+  -Dsonar.python.coverage.reportPaths=coverage.xml</pre>
+</div>
+<div class="info"><b>الحزمة غير الرفع</b>على مشروع بلا مسح، أصلح ما تطبعه الحزمة ثم ارفع مرة. الأمر من جهازك والـ pipeline كلاهما رفع إلى المحرك، لا فحص حزمة. لغير .NET تقوم إضافة المحرر مقام الحزمة بعد أن يوجد مشروع، وبتوكن مستخدم لا يوضع في ملف. التعريف في <a href="SonarQube_Guide_AR_v2.html#g-first">جدول الفحص بالدليل الشامل</a>.</div>
+</section>
+
+<section data-s="b6" data-part="" data-t="تصميم الحزمة وخطة الطرح">
+<h2 id="b6"><span class="n">3</span>تصميم الحزمة (plugin) وخطة الطرح</h2>
+<div class="flow">
+<div class="fn"><b>مستودع الحزمة</b><small>مهارات + hooks + سكربتات + MCP</small></div><span class="fa"></span>
+<div class="fn srv"><b>marketplace.json</b><small>فهرس الحزم المتاحة</small></div><span class="fa"></span>
+<div class="fn srv"><b>settings.json في المشروع</b><small>يعرّف المصدر ويفعّل الحزمة</small></div><span class="fa"></span>
+<div class="fn ok"><b>العضو</b><small>تُعرض عليه الحزمة عند فتح المشروع</small></div>
+</div>
+<h3>3.1 بنية المجلد</h3>
+<pre>sonar-kit/
+├── .claude-plugin/
+│   └── plugin.json
+├── skills/
+│   ├── sonar-server-scan/SKILL.md
+│   ├── sonarqube-check/SKILL.md
+│   └── sonar-conventions/SKILL.md      # الإرشادات كمهارة
+├── hooks/
+│   └── hooks.json
+├── bin/                                 # سكربتات التشغيل
+│   ├── scan-server.sh
+│   └── check-changed.sh
+├── mcp/server.mjs
+└── .mcp.json</pre>
+<div class="good"><b>الحزمة موجودة</b>بُنيت في <code>plugins/sonar-kit</code> داخل مستودع EP، مع فهرس <code>plugins/.claude-plugin/marketplace.json</code>. صيغ <code>plugin.json</code> و<code>hooks.json</code> و<code>.mcp.json</code> تُقرأ، وأوامر الـ hook وMCP تشير إلى ملفات موجودة، و<code>node --check</code> و<code>bash -n</code> ينجحان. الـ hook يخرج مباشرة من مستودع بلا <code>tools/sonar/sonar.json</code>.</div>
+<p><code>technical-review</code> و<code>task-delivery</code> مهارتان في الإضافة نفسها. المراجعة بعد التعديل ليست مسح سيرفر، وشرط Sonar فيها فحص الحزمة. التسليم يعيد ذلك الفحص ولا ينشر. في تقرير التتبع هذا يقابل UC 7.1 للمراجعة، وUC 7.4 لخطوة الدمج داخل التسليم، وUC 6.4 لقراءة MCP. UC 5.1 يكتب الاختبارات والإضافة تقرأ تقريرها فقط. UC 1.7 ليست في الإضافة بعد. فريق آخر لا يحتاج إضافة ثانية: يضع <code>projectKey</code> فريدًا في <code>tools/sonar/sonar.json</code> مع هدف البناء ومشاريع الاختبار، ويُبقي <code>SONAR_TOKEN</code> في بيئة كل شخص. مهارة أو hook إضافي مجلد أو سطر، والحلقة لا تتغير. التفصيل في الدليل الشامل، قسم الأدوات.</p>
+<h3 id="b-alone">ما يلزم لأي مشروع، من غير الدليل الشامل</h3>
+<p class="lead">هذا القسم يكفي لتشغيل الإضافة على مستودعنا أو على مستودع آخر. الدليل الشامل يشرح الشاشات والأرقام.</p>
+<div class="opts">
+<div><b>الحزمة</b>ثوانٍ على C#‎ المتغير. لا ترفع. حتى 3 جولات ثم تتوقف.</div>
+<div><b>إضافة المحرر</b>SonarQube for VS Code. تسطّر الملف وأنت تكتبه. ليست رقمًا في الخريطة: لا ترفع ولا تحكم بالبوابة.</div>
+</div>
+<div class="opts">
+<div><b>الرفع</b>عند الطلب فقط. يكتب اللقطة ويستبدل عرض المفتاح في Community.</div>
+<div><b>المحرك</b>يحسب البوابة والتغطية والتكرار وHotspots من اللقطة.</div>
+</div>
+<p class="small">النوع يُختار من لحظة التشغيل. السهم يعني الصلة. الـ hook يعمل وحده. البوابة توقف الإيداع. المهارة عند الطلب.</p>
+<div class="mermaid">
+flowchart TD
+  hook["sonar-local-gate.sh · Stop hook - عند نهاية كل رد غيّر ملفات، حتى 3 جولات"]
+  chk["check-changed.sh · السكربت - هو الفحص"]
+  pkg["الحزمة و sonar.json"]
+  post["post-change-review.sh · Stop hook - يعرض المراجعة ولا يمنع"]
+  tr["technical-review · مهارة - مراجعة ملف، ليست مسحًا"]
+  gate["technical-review-gate.sh · بوابة - توقف الإيداع"]
+  mark[".review-approved"]
+  srev["sonar-review · مهارة - نفس القائمة بلا علامة"]
+  fix["sonar-local-fix · مهارة - يصلح ما طبعه الـ hook"]
+  sscan["sonar-server-scan · مهارة - عند الطلب فقط"]
+  ssh["scan-server.sh · السكربت - ينشر"]
+  tok["sonar.json والتوكن"]
+  schk["sonarqube-check · مهارة - قراءة أو رفع عند السؤال"]
+  mcp["MCP"]
+  conv["sonar-conventions · مهارة - قواعد لا أمر"]
+  deliv["task-delivery · مهارة - تسليم، بلا مسح سيرفر"]
+  dup["مهارات التكرار · عند الطلب، ليست في الإضافة بعد"]
+
+  hook --> chk
+  chk --> pkg
+  hook --> fix
+  post --> tr
+  tr --> pkg
+  tr --> gate
+  gate --> mark
+  srev --> tr
+  sscan --> ssh
+  ssh --> tok
+  schk --> mcp
+  schk --> ssh
+  conv --> tok
+  deliv --> pkg
+  deliv --> tr
+  dup --> mcp
+</div>
+
+<p>حالات تقرير التتبع تتصل بنفس الإضافة سواء وقعت على مشروعنا أو على مشروع آخر:</p>
+<table>
+<tr><th>حالة الاستخدام</th><th>في الإضافة</th><th>على مشروعنا</th><th>على مشروع آخر</th></tr>
+<tr><td class="k">حلقة SonarQube</td><td>hook ومهارات المسح والقراءة</td><td><span class="en">qGEO-EP-BE</span> أو <span class="en">qGEO-EP.Admin-BE</span></td><td>مفتاح جديد في <code>sonar.json</code></td></tr>
+<tr><td class="k">UC 7.1 المراجعة</td><td><code>technical-review</code></td><td>بعد التعديل. ليست مسح سيرفر.</td><td>نفس المهارة بعد وجود <code>sonar.json</code></td></tr>
+<tr><td class="k">UC 6.4 الدين التقني</td><td>MCP للقراءة</td><td>آخر نشر لمفتاحنا</td><td>آخر نشر لمفتاحهم</td></tr>
+<tr><td class="k">UC 7.4 الدمج</td><td><code>task-delivery</code></td><td>فحص الحزمة بعد الدمج، بلا نشر</td><td>نفس القاعدة على فرعهم</td></tr>
+<tr><td class="k">UC 5.1 الاختبارات</td><td>خارج الإضافة</td><td>المسح يقرأ OpenCover</td><td>بلا تقرير تبقى التغطية 0%</td></tr>
+<tr><td class="k">UC 1.7 التكرار</td><td>ليست في الإضافة بعد</td><td>مجلد لاحق على مفتاحنا</td><td>نفس المجلد على مفتاحهم</td></tr>
+</table>
+<table>
+<tr><th>ما يضعه الفريق الآخر</th><th>المعنى</th></tr>
+<tr><td class="k"><code>projectKey</code></td><td>قيمة فريدة. أول رفع ينشئ المشروع. لا يعيدون مفتاح EP أو Admin.</td></tr>
+<tr><td class="k"><code>solution</code> أو <code>buildTarget</code></td><td>ما يُبنى. بلاهما لا يعرف السكربت ماذا يبني.</td></tr>
+<tr><td class="k"><code>testProjects</code></td><td>من أين يأتي OpenCover.</td></tr>
+<tr><td class="k"><code>SONAR_TOKEN</code></td><td>بيئة كل شخص. ليس في الملف ولا في الإضافة.</td></tr>
+</table>
+<h3>3.2 الملفات الأساسية</h3>
+<pre>// .claude-plugin/plugin.json
+{ "name": "sonar-kit", "version": "0.1.0",
+  "description": "حلقة SonarQube و MCP وبوابات المراجعة" }
+
+// hooks/hooks.json
+{ "hooks": { "Stop": [ { "hooks": [
+  { "type": "command", "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/sonar-local-gate.sh\"" } ] } ] } }
+
+// .mcp.json
+{ "sonarqube-rest": {
+ "type": "stdio",
+ "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/mcp/server.mjs"],
+ "env": { "SONAR_HOST_URL": "${SONAR_HOST_URL:-https://gsonar.alqemam.com}", "SONAR_TOKEN": "${SONAR_TOKEN}" } } }</pre>
+<pre>// .claude-plugin/marketplace.json  (في مستودع التوزيع)
+{ "name": "alqemam-tools", "owner": { "name": "فريق الهندسة" },
+  "plugins": [ { "name": "sonar-kit", "source": "./sonar-kit" } ] }
+
+// .claude/settings.json  (في كل مشروع)
+{ "extraKnownMarketplaces": { "alqemam-tools": {
+    "source": { "source": "git", "url": "URL-OF-INTERNAL-REPO" } } },
+  "enabledPlugins": { "sonar-kit@alqemam-tools": true } }</pre>
+<div class="info"><b>أسماء وقيم توضيحية</b>أسماء الحزمة والمستودع والروابط أعلاه أمثلة. تحقق من الصيغة الحالية في توثيق Claude Code للـ plugins و marketplaces قبل النشر.</div>
+<h3>3.3 ما يدخل الحزمة وما يبقى خارجها</h3>
+<div class="info"><b>الخلاصة</b>الفصل ليس عيبًا نصلحه، بل في معظمه قرار صحيح. نجمع <b>الجزء العام فقط</b> في حزمة مشتركة، ونُبقي الباقي حيث يجب أن يكون.</div>
+<div class="good"><b>يدخل الحزمة</b>المهارات العامة (حلقة الصفر ومهارات التكرار ومهارة الإرشادات)، الـ hooks، سكربتات الفحص والمسح بعد تعميمها (تقرأ <code>sonar.json</code>)، خادم MCP، القوالب.</div>
+<table>
+<tr><th>ما يبقى خارج الحزمة</th><th>سبب الفصل</th></tr>
+<tr><td class="k"><code>sonar.json</code> و<code>coverlet.runsettings</code> وملف الـ pipeline</td><td>هذه ملفات المستودع نفسه: يجب أن تُراجَع وتُصدَّر مع الكود في كل commit، وتختلف بين المشاريع. لو انتقلت إلى حزمة صار تغيير إعداد مشروع مرتبطًا بإصدار أداة.</td></tr>
+<tr><td class="k">pipeline CI والمسح على السيرفر</td><td>الـ pipeline يعمل بلا Claude ولا مهارات، فهو يعتمد على ملفات المستودع وليس على حزمة مثبّتة عند المطوّر.</td></tr>
+<tr><td class="k">الجزء الخاص بـ .NET (<code>sonar.globalconfig</code> وقائمة المراجعة)</td><td>لا مقابل له في لغات أخرى؛ حزمة عامة تحمله ستحمل ما لا ينطبق، لذا يُفصل كمهايئ.</td></tr>
+<tr><td class="k">التوكن</td><td>لا يوضع في أي ملف أو حزمة، بل في متغير بيئة المستخدم. أي تجميع يجب ألا يقرّبه من الملفات.</td></tr>
+</table>
+<div class="note"><b>الخلاف المحتمل</b>إن رأى الفريق أن الجمع الكامل أبسط للتعلّم، فالبديل حزمتان: <code>sonar-kit</code> للنواة العامة، و<code>sonar-kit-dotnet</code> لمهايئ .NET (المحلل المحلي وقائمة المراجعة). القرار يعود لمن يملك الأدوات، ولا يغيّر الفصل بين الحزمة وملفات المستودع.</div>
+<p>خيار على مستوى المؤسسة: فرض الحزمة عبر إعدادات مُدارة بدل <code>.claude/settings.json</code> في كل مشروع، إن أردتم إلزامًا لا اختيارًا. القرار لإدارة الأدوات لا للمطوّر.</p>
+
+<h3 id="b7">3.4 خطة الطرح على مراحل</h3>
+
+<h4>نقطة البداية: لماذا هي متفرقة اليوم</h4>
+<div class="brs">
+<div class="br"><h5 class="y">نشأت في نطاقات مختلفة</h5>مهارة <code>sonar-server-scan</code> داخل المستودع (<code>.claude/skills</code>) وتسافر معه، بينما <code>technical-review</code> و<code>sonar-local-fix</code> و<code>sonarqube-check</code> على مستوى المستخدم في <code>~/.claude/skills</code>، وبعض الـ hooks في مجلد المستخدم وبعضها في المستودع.</div>
+<div class="br"><h5 class="y">بُنيت لحاجات في أوقات مختلفة</h5>الفحص المحلي والبوابات للعمل اليومي؛ مسح السيرفر لمهمة الصفر؛ مهارات التكرار لتحليل منفصل. لم تُكتب كمنتج واحد.</div>
+<div class="br"><h5 class="y">لم يُعمَّم بعضها بعد</h5>مسارات ومفاتيح EP و Admin مكتوبة في بعض السكربتات والمهارات، فنسخها كما هي لمشروع آخر تنفع جزئيًّا فقط. تعميمها هو المرحلتان 1 و2 أدناه.</div>
+</div>
+<h4>المراحل</h4>
+<div class="tl">
+<div class="ph"><span class="pn">1</span><b>جرد وتصنيف</b>اعتمد جدول القسم 1.1: كل المهارات والـ hooks والسكربتات، وتصنيف كلٍّ إلى عام أو خاص بلغة أو خاص بمشروع.<em>الناتج: قائمة الحزمة · الاكتمال: لا ملف بلا تصنيف</em></div>
+<div class="ph"><span class="pn">2</span><b>تعميم</b>إزالة المسارات ومفاتيح المشاريع من الكود وقراءتها من إعداد كل مستودع، واختيار المهايئ حسب لغة المشروع.<em>الناتج: سكربتات بلا قيم ثابتة · الاكتمال: تعمل على مستودع ثانٍ</em></div>
+<div class="ph"><span class="pn">3</span><b>حزمة .NET أولًا</b>هو المجرَّب لدينا: تعبئة الحزمة ومستودع توزيعها كما في القسم 3.<em>الناتج: EP و Admin يعملان من الحزمة · الاكتمال: عضو جديد يثبّتها في دقيقة</em></div>
+<div class="ph"><span class="pn">4</span><b>مهايئ ثانٍ</b>JS/TS (قريب من تقنيات الواجهة لدينا): تجربة على مشروع غير .NET واحد على الأقل وتصحيح ما يخصّ المنصة.<em>الناتج: ملاحظات وتعديلات · الاكتمال: دورة كاملة نظيفة موثّقة</em></div>
+<div class="ph"><span class="pn">5</span><b>تثبيت الحوكمة</b>مالك للحزمة، وأرقام إصدارات وسجل تغييرات، وقناة ملاحظات، وقرار التحديث التلقائي أو اليدوي (القسم 4.3).<em>الناتج: سياسة معلنة · الاكتمال: مالك معلن</em></div>
+</div>
+</section>
+
+<section data-s="b8" data-part="" data-t="القوالب والحوكمة">
+<h2 id="b8"><span class="n">4</span>القوالب الجاهزة والحوكمة</h2>
+<h3>4.1 قالب مهارة الإرشادات</h3>
+<pre>---
+name: sonar-conventions
+description: قواعد العمل مع SonarQube في هذا المشروع. استخدمها عند مسح فاشل، أو قبل استثناء قاعدة، أو عند تقرير النتيجة.
+---
+# المسح
+1. شغّل المسح عبر bin/scan-server.sh، ولا تضع التوكن في ملف.
+2. اقرأ السيرفر بعد كل مسح، ولا تعتمد على قائمة قديمة.
+# القبول
+- لا تغيّر سلوك العمل لإرضاء قاعدة.
+- كل استثناء في sonar.json له قاعدة ومسار وسبب.
+# التقرير
+- الأعداد قبل وبعد، المصلَح والمقبول بسببه، حالة البوابة، رابط اللوحة.</pre>
+<h3>4.2 قائمة تهيئة مشروع جديد</h3>
+<div class="ckl" data-ck="pbnew">
+<label><input type="checkbox"><span>توكن القراءة في متغير البيئة <code>SONAR_TOKEN</code> وليس في أي ملف.</span></label>
+<label><input type="checkbox"><span>مفتاح المشروع متفق عليه ومكتوب في <code>sonar.json</code>.</span></label>
+<label><input type="checkbox"><span>اختير المهايئ وبُني المشروع بنجاح محليًّا.</span></label>
+<label><input type="checkbox"><span>تقرير التغطية يُنتَج ومساره صحيح.</span></label>
+<label><input type="checkbox"><span>الـ pipeline: الاختبار قبل التحليل، والسجل يذكر استيراد التقرير.</span></label>
+<label><input type="checkbox"><span>الحزمة مثبّتة و MCP يعيد حالة البوابة.</span></label>
+<label><input type="checkbox"><span>أول مسح تم، وحلقة الصفر انتهت أو سُجّل المتبقي وسببه.</span></label>
+<label><input type="checkbox"><span>اتفق الفريق على pipeline النشر الواحد (تحذير Community).</span></label>
+</div>
+
+<h3 id="b9">4.3 الحوكمة والمخاطر</h3>
+
+<table>
+<tr><th>الخطر</th><th>التخفيف</th></tr>
+<tr><td class="k">أمر Hook ينفَّذ على جهاز كل عضو</td><td>مراجعة أي تغيير في <code>hooks.json</code> كما نراجع الكود، ومالك واحد للحزمة.</td></tr>
+<tr><td class="k">تسرّب التوكن</td><td>متغير بيئة مستخدم فقط، والسكربتات تقنّع المخرجات، وأي تسرّب يعني حذف السجل وتدوير التوكن.</td></tr>
+<tr><td class="k">تحديث الحزمة يكسر مشروعًا</td><td>أرقام إصدارات صريحة، وتثبيت الإصدار في المشاريع الحساسة.</td></tr>
+<tr><td class="k">مالك واحد لكل شيء يصبح عنق زجاجة</td><td>نجمع الجزء العام فقط (القسم 3)، وتبقى ملفات كل مستودع عند فريقه.</td></tr>
+<tr><td class="k">مسح يستبدل لوحة مشتركة</td><td>pipeline نشر واحد معتمد (Community لا يدعم الفروع).</td></tr>
+<tr><td class="k">استثناء يخفي مشكلة حقيقية</td><td>كل استثناء بسبب وملف دقيق، ومراجعة دورية لقائمة <code>ignore</code>.</td></tr>
+<tr><td class="k">ادعاء تطبيق على لغة لم نجرّبها</td><td>لا نصف أي لغة بأنها «مدعومة» قبل دورة تجربة نظيفة (الخطوة 8).</td></tr>
+</table>
+<div class="linkrow noprint"><a class="btn pri" href="SonarQube_Guide_AR_v2.html#s12">← كتالوج المهارات والأدوات في الدليل الشامل</a><a class="btn" href="SonarQube_Guide_AR_v2.html#s10">← كيف نصلح، بالترتيب</a></div>
+</section>
+
+</main>
+</div>
+<div id="lb" role="dialog" aria-label="عرض مكبّر"></div>
+<script>
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const KEY='sq-ar-theme';
+function buildToc(){
+ const ol=$('#toc'), secs=$$('section[data-s]');
+ secs.forEach((s,i)=>{const a=document.createElement('a'); a.href='#'+s.dataset.s; a.textContent=(i+1)+'. '+s.dataset.t; const li=document.createElement('li'); li.append(a); ol.append(li);});
+ const links=$$('#toc a');
+ const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){links.forEach(l=>l.classList.toggle('on',l.getAttribute('href')==='#'+e.target.dataset.s));}});},{rootMargin:'-10% 0px -80% 0px'});
+ secs.forEach(s=>io.observe(s));
+}
+function setupChrome(){
+ const body=document.body, btn=$('#btnMenu');
+ const set=o=>{body.classList.toggle('menu',o); btn.setAttribute('aria-expanded',String(o));};
+ btn.addEventListener('click',()=>set(!body.classList.contains('menu')));
+ $('#scrim').addEventListener('click',()=>set(false));
+ $('#toc').addEventListener('click',e=>{ if(e.target.closest('a')) set(false); });
+ const root=document.documentElement;
+ const apply=t=>{root.setAttribute('data-theme',t); try{localStorage.setItem(KEY,t);}catch(e){} $('#btnTheme').textContent=(t==='dark'?'☀ الوضع النهاري':'◐ الوضع الليلي');};
+ let t='light'; try{t=localStorage.getItem(KEY)||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');}catch(e){}
+ apply(t);
+ const tog=()=>apply(root.getAttribute('data-theme')==='dark'?'light':'dark');
+ $('#btnTheme').addEventListener('click',tog); $('#btnTheme2').addEventListener('click',tog);
+ const prog=$('#prog i'), top=$('#totop');
+ const upd=()=>{const d=document.documentElement; const m=d.scrollHeight-innerHeight; prog.style.width=(m>0?scrollY/m*100:0)+'%'; top.classList.toggle('show',scrollY>700);};
+ addEventListener('scroll',upd,{passive:true}); upd();
+ top.addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'}));
+ $('#btnPrint').addEventListener('click',()=>{const r=document.documentElement,th=r.getAttribute('data-theme'); r.setAttribute('data-theme','light'); window.print(); r.setAttribute('data-theme',th||'light');});
+}
+function wrapTables(){
+ $$('main table').forEach(t=>{
+  if(t.parentElement.classList.contains('tw')) return;
+  const w=document.createElement('div'); w.className='tw'; t.replaceWith(w); w.append(t);
+  const ths=$$('th',t).map(x=>x.textContent.trim());
+  $$('tr',t).forEach(tr=>{ $$('td',tr).forEach((td,i)=>td.setAttribute('data-label',ths[i]||'')); });
+ });
+}
+function setupChips(){
+ $$('#pbchips .chip').forEach(c=>c.addEventListener('click',()=>{
+  $$('#pbchips .chip').forEach(x=>x.classList.toggle('on',x===c));
+  const g=c.dataset.g; $$('#pbtable tr[data-g]').forEach(r=>{r.hidden=!(g==='all'||r.dataset.g===g);});
+ }));
+ $$('#stkchips .chip').forEach(c=>c.addEventListener('click',()=>{
+  $$('#stkchips .chip').forEach(x=>x.classList.toggle('on',x===c));
+  $$('.stk').forEach(s=>{s.hidden=s.dataset.st!==c.dataset.st;});
+ }));
+}
+function setupChecklists(){
+ $$('.ckl').forEach(box=>{
+  const key='sq-ar-'+box.dataset.ck; let st={}; try{st=JSON.parse(localStorage.getItem(key)||'{}');}catch(e){}
+  $$('label',box).forEach((l,i)=>{ const cb=$('input',l); cb.checked=!!st[i]; l.classList.toggle('done',cb.checked);
+   cb.addEventListener('change',()=>{ l.classList.toggle('done',cb.checked); st[i]=cb.checked; try{localStorage.setItem(key,JSON.stringify(st));}catch(e){} }); });
+ });
+}
+function setupCopy(){
+ $$('pre').forEach(p=>{ const b=document.createElement('button'); b.className='cp noprint'; b.type='button'; b.textContent='نسخ';
+  b.addEventListener('click',()=>{ const t=p.innerText.replace(/^نسخ\n?/,''); (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>{b.textContent='تم';setTimeout(()=>b.textContent='نسخ',1200);}).catch(()=>{const r=document.createRange(); r.selectNodeContents(p); const s=getSelection(); s.removeAllRanges(); s.addRange(r);}); });
+  p.prepend(b); });
+}
+
+function setupPalette(){
+ const root=document.documentElement, KEYP='sq-ar-pal';
+ const apply=v=>{ if(v==='warm') root.removeAttribute('data-palette'); else root.setAttribute('data-palette',v); try{localStorage.setItem(KEYP,v);}catch(e){} document.querySelectorAll('#pal button').forEach(b=>b.classList.toggle('on',b.dataset.pal===v)); };
+ let v='editorial'; try{v=localStorage.getItem(KEYP)||'editorial';}catch(e){}
+ apply(v);
+ document.querySelectorAll('#pal button').forEach(b=>b.addEventListener('click',()=>apply(b.dataset.pal)));
+}
+
+/* ---------- إحالات الأقسام القابلة للنقر + زر العودة ---------- */
+function setupXrefs(){
+ const main=$('main'); if(!main) return;
+ const buildMap=()=>{ const map={};
+  $$('section[data-s]').forEach(s=>{ const n=$('h2 .n',s), h2=$('h2',s); if(n&&h2) map[n.textContent.trim()]=h2.id||s.dataset.s;
+   $$('h3,h4',s).forEach(h=>{ const m=h.textContent.trim().match(/^(\d+(?:\.\d+){1,2})(?![\d])/); if(m&&!map[m[1]]){ if(!h.id) h.id='ref-'+m[1].replace(/\./g,'-'); map[m[1]]=h.id; } }); });
+  return map; };
+ let busy=false;
+ const run=()=>{ if(busy) return; busy=true; const map=buildMap();
+  const w=document.createTreeWalker(main,NodeFilter.SHOW_TEXT,{acceptNode:n=>{ if(!/القسم\s+\d/.test(n.nodeValue)) return NodeFilter.FILTER_REJECT; const p=n.parentElement; if(!p||p.closest('a,code,pre,script,style,textarea,input,#toc,.noxref')) return NodeFilter.FILTER_REJECT; return NodeFilter.FILTER_ACCEPT; }});
+  const nodes=[]; while(w.nextNode()) nodes.push(w.currentNode);
+  nodes.forEach(n=>{ const txt=n.nodeValue, re=/القسم\s+(\d+(?:\.\d+){0,2})/g; let m,last=0,frag=document.createDocumentFragment(),hit=false;
+   while((m=re.exec(txt))){ const id=map[m[1]]; if(!id) continue; hit=true; frag.append(txt.slice(last,m.index)); const a=document.createElement('a'); a.className='xref'; a.href='#'+id; a.textContent=m[0]; a.title='انتقل إلى القسم '+m[1]; frag.append(a); last=m.index+m[0].length; }
+   if(hit){ frag.append(txt.slice(last)); n.replaceWith(frag); } });
+  busy=false; };
+ run();
+ let t=null; new MutationObserver(()=>{ clearTimeout(t); t=setTimeout(run,120); }).observe(main,{childList:true,subtree:true,characterData:false});
+ /* زر العودة */
+ const stack=[]; const btn=document.createElement('button'); btn.id='xback'; btn.type='button'; btn.className='noprint'; btn.hidden=true; btn.textContent='↩ العودة إلى مكانك السابق'; document.body.append(btn);
+ const upd=()=>{ btn.hidden=!stack.length; };
+ document.addEventListener('click',e=>{ const a=e.target.closest('a[href^="#"]'); if(!a||a.closest('#toc')||a.getAttribute('href').length<2) return; const tgt=document.getElementById(a.getAttribute('href').slice(1)); if(!tgt) return;
+  stack.push(scrollY); if(stack.length>20) stack.shift(); upd(); });
+ btn.addEventListener('click',()=>{ const y=stack.pop(); upd(); if(y!=null) scrollTo({top:y,behavior:'smooth'}); });
+ addEventListener('scroll',()=>{ if(stack.length&&Math.abs(scrollY-stack[stack.length-1])<90){ stack.pop(); upd(); } },{passive:true});
+}
+
+/* ---------- وضع العرض التقديمي ---------- */
+function setupPresent(){
+ const body=document.body, main=document.querySelector('main'); if(!main) return;
+ let slides=[], wraps=[], idx=0, on=false; const back=[];
+ const bar=document.createElement('div'); bar.id='pbar'; bar.className='noprint';
+ bar.innerHTML='<button type="button" id="pPrev" class="pnav" title="السابق (←)">←</button><button type="button" id="pBack" title="رجوع إلى الشريحة التي جئت منها" hidden>↩</button><span id="pCount"></span><span id="pTitle"></span><button type="button" id="pFull" title="ملء الشاشة (F)">⤢</button><button type="button" id="pExit" title="إنهاء العرض (Esc)">✕</button><button type="button" id="pNext" class="pnav" title="التالي (→)">→</button>';
+ const prog=document.createElement('i'); prog.id='pProg'; prog.className='noprint';
+ body.append(bar, prog);
+ const q=s=>document.getElementById(s);
+ const lbOpen=()=>{ const lb=q('lb'); return lb && getComputedStyle(lb).display!=='none'; };
+ const wrap=nodes=>{ if(!nodes.length) return null; const d=document.createElement('div'); d.className='slide'; nodes[0].parentNode.insertBefore(d,nodes[0]); nodes.forEach(n=>d.append(n)); wraps.push(d); return d; };
+ const flush=pre=>{ if(!pre.length) return; const ci=pre.findIndex(x=>x.matches('.info,.note,.warn,.good')); const a=ci<=0?pre:pre.slice(0,ci), b=ci<=0?[]:pre.slice(ci); [a,b].forEach(g=>{ const s=wrap(g); if(s) slides.push(s); }); };
+ const build=()=>{ slides=[]; wraps=[]; let pre=[];
+  [...main.children].forEach(k=>{
+   if(!k.matches('section[data-s]')){ pre.push(k); return; }
+   flush(pre); pre=[];
+   let cur=[]; const groups=[];
+   [...k.children].forEach(c=>{ if(c.tagName==='H3'&&cur.length){ groups.push(cur); cur=[]; } cur.push(c); });
+   if(cur.length) groups.push(cur);
+   groups.forEach(g=>{ const s=wrap(g); if(s) slides.push(s); });
+  });
+  flush(pre); };
+ const avail=()=>{ const cs=getComputedStyle(main); return main.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom); };
+ const split=()=>{ body.classList.add('measuring'); const A=avail(), out=[];
+  slides.forEach(s=>{ out.push(s); if(s.scrollHeight<=A*1.06||s.children.length<2) return;
+   const kids=[...s.children], hd=s.querySelector('h3')||s.querySelector('h2'), label=hd?hd.textContent.trim():'';
+   const chunks=[]; let chunk=[], top=null;
+   kids.forEach(c=>{ const t=c.offsetTop, b=t+c.offsetHeight; if(top===null) top=t; if(chunk.length&&b-top>A){ chunks.push(chunk); chunk=[]; top=t; } chunk.push(c); });
+   if(chunk.length) chunks.push(chunk);
+   let after=s;
+   chunks.slice(1).forEach(ch=>{ const d=document.createElement('div'); d.className='slide'; const tag=document.createElement('div'); tag.className='cont-tag'; tag.textContent='تابع · '+label; d.append(tag); ch.forEach(n=>d.append(n)); after.after(d); after=d; wraps.push(d); out.push(d); });
+  });
+  slides=out; body.classList.remove('measuring'); };
+ const fit=s=>{ s.style.zoom=''; requestAnimationFrame(()=>{ const A=avail(), h=s.scrollHeight; if(h>A) s.style.zoom=Math.max(.62,A/h).toFixed(3); }); };
+ let rt=null; addEventListener('resize',()=>{ if(!on) return; clearTimeout(rt); rt=setTimeout(()=>{ const s=slides[idx], first=s&&[...s.children].find(x=>!x.classList.contains('cont-tag')); unwrap(); build(); split(); const k=slides.findIndex(x=>first&&x.contains(first)); show(k<0?0:k); },250); });
+ const unwrap=()=>{ main.querySelectorAll('.cont-tag').forEach(x=>x.remove()); wraps.forEach(d=>{ while(d.firstChild) d.parentNode.insertBefore(d.firstChild,d); d.remove(); }); wraps=[]; slides=[]; };
+ const title=s=>{ const sec=s.closest('section[data-s]'); if(!sec) return 'الغلاف'; const n=sec.querySelector('h2 .n'); return (n?n.textContent+'. ':'')+(sec.dataset.t||''); };
+ const show=i=>{ idx=Math.max(0,Math.min(slides.length-1,i)); slides.forEach((s,k)=>s.classList.toggle('cur',k===idx)); main.scrollTop=0; fit(slides[idx]);
+  q('pCount').textContent=(idx+1)+' / '+slides.length; q('pTitle').textContent=title(slides[idx]); prog.style.width=((idx+1)/slides.length*100)+'%'; q('pBack').hidden=!back.length; };
+ const enter=fromTop=>{ if(on) return; const probe=fromTop?null:document.elementFromPoint(innerWidth/2,Math.min(170,innerHeight/3));
+  on=true; body.classList.add('present'); build(); split(); let i=0; if(probe){ const k=slides.findIndex(s=>s.contains(probe)); if(k>=0) i=k; } back.length=0; show(i); };
+ const exit=()=>{ if(!on) return; const first=slides[idx]&&slides[idx].firstElementChild; on=false; body.classList.remove('present'); unwrap();
+  if(document.fullscreenElement) document.exitFullscreen().catch(()=>{}); if(first) first.scrollIntoView({block:'start'}); };
+ document.addEventListener('click',e=>{ const b=e.target.closest('[data-present]'); if(b){ e.preventDefault(); enter(b.hasAttribute('data-top')); } });
+ q('pNext').addEventListener('click',()=>show(idx+1)); q('pPrev').addEventListener('click',()=>show(idx-1)); q('pExit').addEventListener('click',exit);
+ q('pFull').addEventListener('click',()=>{ if(document.fullscreenElement) document.exitFullscreen().catch(()=>{}); else if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{}); });
+ q('pBack').addEventListener('click',()=>{ if(back.length) show(back.pop()); });
+ document.addEventListener('click',e=>{ if(!on) return; const a=e.target.closest('a[href^="#"]'); if(!a) return; const id=a.getAttribute('href').slice(1); const t=id&&document.getElementById(id); if(!t) return;
+  const k=slides.findIndex(s=>s.contains(t)); if(k<0) return; e.preventDefault(); e.stopPropagation(); back.push(idx); show(k);
+  if(t!==slides[k].firstElementChild) setTimeout(()=>t.scrollIntoView({block:'start'}),40); },true);
+ document.addEventListener('keydown',e=>{ if(!on||lbOpen()) return; const tg=e.target; if(tg&&tg.closest&&tg.closest('input,select,textarea')) return;
+  const atEnd=main.scrollTop+main.clientHeight>=main.scrollHeight-4;
+  if(e.key==='ArrowRight'||e.key==='PageDown'||(e.key===' '&&atEnd)){ e.preventDefault(); show(idx+1); }
+  else if(e.key==='ArrowLeft'||e.key==='PageUp'){ e.preventDefault(); show(idx-1); }
+  else if(e.key==='Home'){ e.preventDefault(); show(0); } else if(e.key==='End'){ e.preventDefault(); show(slides.length-1); }
+  else if(e.key==='Escape'){ exit(); } else if(e.key==='f'||e.key==='F'){ q('pFull').click(); } });
+ let tx=null; main.addEventListener('touchstart',e=>{ if(on) tx=e.touches[0].clientX; },{passive:true});
+ main.addEventListener('touchend',e=>{ if(!on||tx==null) return; const dx=e.changedTouches[0].clientX-tx; tx=null; if(Math.abs(dx)>70) show(idx+(dx<0?1:-1)); },{passive:true});
+}
+
+/* ---------- الشعار يعيد لأول الصفحة ---------- */
+function setupHome(){
+ document.querySelectorAll('.home').forEach(el=>el.addEventListener('click',()=>{ document.body.classList.remove('menu'); scrollTo({top:0,behavior:'smooth'}); }));
+}
+/* ---------- أجزاء القائمة قابلة للطي ---------- */
+function setupParts(){
+ const ol=document.getElementById('toc'); if(!ol) return; let p=-1;
+ [...ol.children].forEach(li=>{
+  if(li.classList.contains('part')){ p++; const label=li.textContent; li.textContent=''; const b=document.createElement('button'); b.type='button'; b.className='pt'; b.setAttribute('aria-expanded','true'); b.innerHTML='<span></span><i aria-hidden="true">▾</i>'; b.firstChild.textContent=label; li.append(b); li.dataset.p=p;
+   b.addEventListener('click',()=>{ const open=b.getAttribute('aria-expanded')!=='true'; b.setAttribute('aria-expanded',String(open)); li.classList.toggle('closed',!open); ol.querySelectorAll('li[data-in="'+li.dataset.p+'"]').forEach(x=>x.hidden=!open); }); }
+  else if(p>=0) li.dataset.in=p;
+ });
+ new MutationObserver(()=>{ const on=ol.querySelector('a.on'); if(!on) return; const li=on.closest('li'); if(li&&li.hidden){ const part=ol.querySelector('li.part[data-p="'+li.dataset.in+'"] .pt'); if(part) part.click(); } }).observe(ol,{subtree:true,attributes:true,attributeFilter:['class']});
+}
+/* ---------- حركة توضيحية عند الظهور ---------- */
+function setupMotion(){
+ if(!('IntersectionObserver' in window)) return;
+ const root=document.documentElement; root.classList.add('anim-on');
+ const sel='main section[data-s]>h2, .jr, .kpis>div, .use3 .card, .flow .fn, .brs .br, .gate4>div, .opts>div, .tl .ph, .hist, .nc, .ba, .grid2>.card, .grid3>.stat, .wt, .rule, .related';
+ const items=[...document.querySelectorAll(sel)];
+ items.forEach(el=>{ el.classList.add('rv'); const sib=[...el.parentElement.children].filter(x=>x.matches(sel)); const i=sib.indexOf(el); el.style.setProperty('--d',Math.min(i,6)*90+'ms'); });
+ const fmt=(v,dec,comma,pct)=>{ let s=comma?v.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec}):v.toFixed(dec); return s+pct; };
+ const count=el=>{ const t=el.textContent.trim(), m=t.match(/^([\d,]+(?:\.\d+)?)(%?)$/); if(!m) return;
+  const to=parseFloat(m[1].replace(/,/g,'')), from=parseFloat(el.dataset.from||'0'), dec=(m[1].split('.')[1]||'').length, comma=m[1].includes(',')||from>=1000, t0=performance.now(), D=1500;
+  const step=now=>{ const k=Math.min(1,(now-t0)/D), e=1-Math.pow(1-k,3); el.textContent=fmt(from+(to-from)*e,dec,comma,m[2]); if(k<1) requestAnimationFrame(step); else el.textContent=t; };
+  requestAnimationFrame(step); };
+ const draw=h=>{ h.querySelectorAll('polyline').forEach(pl=>{ if(!pl.getTotalLength) return; const L=pl.getTotalLength(); pl.style.strokeDasharray=L; pl.style.strokeDashoffset=L; pl.getBoundingClientRect(); pl.style.transition='stroke-dashoffset 2s cubic-bezier(.16,1,.3,1)'; pl.style.strokeDashoffset='0'; }); };
+ const io=new IntersectionObserver(es=>es.forEach(e=>{ if(!e.isIntersecting) return; const el=e.target; el.classList.add('in'); io.unobserve(el);
+  el.querySelectorAll('.cnt').forEach((c,i)=>setTimeout(()=>count(c),200+i*120)); if(el.classList.contains('hist')) draw(el); }),{threshold:.18});
+ items.forEach(el=>io.observe(el));
+ addEventListener('beforeprint',()=>items.forEach(el=>el.classList.add('in')));
+}
+
+wrapTables(); setupChrome(); setupPalette(); buildToc(); setupChips(); setupChecklists(); setupCopy(); setupXrefs(); setupPresent(); setupHome(); setupParts(); setupMotion();
+</script>
+<script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+const dark = document.documentElement.getAttribute("data-theme") === "dark";
+mermaid.initialize({ startOnLoad: false, securityLevel: "loose", theme: dark ? "dark" : "neutral" });
+try {
+  await mermaid.run({ querySelector: ".mermaid" });
+} catch (e) {
+  document.querySelectorAll(".mermaid").forEach(el => { el.textContent = e.message || String(e); });
+}
+document.querySelectorAll(".mermaid svg").forEach(svg => {
+  const el = svg.closest(".mermaid");
+  if (!el || el.closest(".mmd-wrap")) return;
+  const wrap = document.createElement("div");
+  wrap.className = "mmd-wrap";
+  el.parentNode.insertBefore(wrap, el);
+  wrap.append(el);
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "btn noprint mmd-max";
+  b.textContent = "⤢ تكبير";
+  b.addEventListener("click", () => openMmd(el));
+  wrap.append(b);
+});
+function openMmd(el) {
+  let lb = document.getElementById("mmdLb");
+  if (!lb) {
+    lb = document.createElement("div");
+    lb.id = "mmdLb";
+    lb.innerHTML = '<div id="mmdBar"></div><div id="mmdStage"></div>';
+    document.body.append(lb);
+    document.addEventListener("keydown", ev => { if (ev.key === "Escape") lb.classList.remove("on"); });
+  }
+  const stage = lb.querySelector("#mmdStage");
+  const bar = lb.querySelector("#mmdBar");
+  stage.replaceChildren();
+  bar.replaceChildren();
+  const svg = el.querySelector("svg").cloneNode(true);
+  stage.append(svg);
+  let z = 1, x = 24, y = 24, drag = null;
+  const apply = () => { svg.style.transform = "translate(" + x + "px," + y + "px) scale(" + z + ")"; svg.style.transformOrigin = "0 0"; };
+  apply();
+  const mk = (label, fn) => {
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.className = "btn"; btn.textContent = label;
+    btn.addEventListener("click", fn); bar.append(btn);
+  };
+  mk("−", () => { z = Math.max(0.3, +(z - 0.25).toFixed(2)); apply(); });
+  mk("+", () => { z = Math.min(5, +(z + 0.25).toFixed(2)); apply(); });
+  mk("ملاءمة", () => { z = 1; x = 24; y = 24; apply(); });
+  mk("✕ إغلاق", () => lb.classList.remove("on"));
+  stage.onwheel = ev => { ev.preventDefault(); z = Math.min(5, Math.max(0.3, z + (ev.deltaY < 0 ? 0.12 : -0.12))); apply(); };
+  stage.onpointerdown = ev => { drag = { px: ev.clientX, py: ev.clientY, x, y }; stage.setPointerCapture(ev.pointerId); };
+  stage.onpointermove = ev => { if (!drag) return; x = drag.x + ev.clientX - drag.px; y = drag.y + ev.clientY - drag.py; apply(); };
+  stage.onpointerup = () => { drag = null; };
+  lb.classList.add("on");
+}
+</script>
+</body>
+</html>
